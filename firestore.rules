@@ -26,6 +26,16 @@ service cloud.firestore {
     //   - instructions: string (optional)
     //   - createdAt: number (required, immutable)
     //   - authorUid: string (required, immutable)
+    // Collection: feedback
+    // Document ID: auto-generated
+    // Fields:
+    //   - userId: string (required, immutable)
+    //   - userEmail: string (required, immutable)
+    //   - prompt: string (optional, immutable)
+    //   - response: string (required, immutable)
+    //   - rating: string (optional, immutable)
+    //   - comment: string (optional, immutable)
+    //   - createdAt: number (required, immutable)
     // ===============================================================
 
     // ===============================================================
@@ -70,6 +80,18 @@ service cloud.firestore {
              (!('profileCompleted' in data) || data.profileCompleted is bool);
     }
 
+    function isValidFeedback() {
+      let data = request.resource.data;
+      return data.keys().hasAll(['userId', 'userEmail', 'response', 'createdAt']) &&
+             data.userId == request.auth.uid &&
+             (data.userEmail == request.auth.token.email || (data.userEmail == '' && !('email' in request.auth.token))) &&
+             data.response is string && data.response.size() > 0 && data.response.size() <= 100000 &&
+             (!('prompt' in data) || (data.prompt is string && data.prompt.size() <= 100000)) &&
+             (!('rating' in data) || data.rating in ['up', 'down']) &&
+             (!('comment' in data) || (data.comment is string && data.comment.size() <= 10000)) &&
+             data.createdAt is number;
+    }
+
     // ===============================================================
     // Collection Rules
     // ===============================================================
@@ -96,6 +118,13 @@ service cloud.firestore {
       allow update: if isAdmin() && isValidKnowledgeDoc() &&
                        request.resource.data.createdAt == resource.data.createdAt &&
                        request.resource.data.authorUid == resource.data.authorUid;
+      allow delete: if isAdmin();
+    }
+
+    match /feedback/{feedbackId} {
+      allow read: if isAdmin();
+      allow create: if isAuthenticated() && isValidFeedback();
+      allow update: if false;
       allow delete: if isAdmin();
     }
   }

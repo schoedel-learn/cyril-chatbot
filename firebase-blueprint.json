@@ -30,6 +30,21 @@
         "authorUid": { "type": "string", "description": "UID of the user who uploaded it" }
       },
       "required": ["title", "content", "createdAt", "authorUid"]
+    },
+    "Feedback": {
+      "title": "Feedback",
+      "description": "User feedback on AI responses",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "UID of the user who submitted feedback" },
+        "userEmail": { "type": "string", "description": "Email of the user who submitted feedback" },
+        "prompt": { "type": "string", "description": "The prompt that generated the response" },
+        "response": { "type": "string", "description": "The AI response" },
+        "rating": { "type": "string", "description": "The rating given by the user (up or down)" },
+        "comment": { "type": "string", "description": "The user's comment" },
+        "createdAt": { "type": "number", "description": "Creation timestamp" }
+      },
+      "required": ["userId", "userEmail", "response", "createdAt"]
     }
   },
   "firestore": {
@@ -40,6 +55,10 @@
     "/knowledge_base/{docId}": {
       "schema": { "$ref": "KnowledgeDocument" },
       "description": "Knowledge base documents for OCIA"
+    },
+    "/feedback/{feedbackId}": {
+      "schema": { "$ref": "Feedback" },
+      "description": "User feedback on AI responses"
     }
   }
 }

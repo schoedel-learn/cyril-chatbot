@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, inject, signal, OnInit, ViewChild, ElementRef, AfterViewChecked} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject, signal, computed, OnInit, ViewChild, ElementRef, AfterViewChecked} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MatIconModule} from '@angular/material/icon';
 import {MatButtonModule} from '@angular/material/button';
@@ -9,6 +9,15 @@ import {GeminiService} from './gemini.service';
 import {auth, db, googleProvider} from './firebase';
 import {signInWithPopup, onAuthStateChanged, User} from 'firebase/auth';
 import {doc, getDoc, setDoc, collection, onSnapshot, addDoc, deleteDoc} from 'firebase/firestore';
+
+interface ChatMessage {
+  id: string;
+  role: 'user' | 'bot';
+  text: string;
+  rating?: 'up' | 'down';
+  feedbackSubmitted?: boolean;
+  showFeedbackForm?: boolean;
+}
 
 interface KnowledgeDoc {
   id: string;
@@ -39,7 +48,7 @@ export class App implements OnInit, AfterViewChecked {
   
   // State
   view = signal<'chat' | 'kb'>('chat');
-  messages = signal<{role: 'user' | 'bot', text: string}[]>([]);
+  messages = signal<ChatMessage[]>([]);
   prompt = signal('');
   loading = signal(false);
   user = signal<User | null>(null);
@@ -62,6 +71,15 @@ export class App implements OnInit, AfterViewChecked {
 
   // Knowledge Base State
   kbDocs = signal<KnowledgeDoc[]>([]);
+  kbSearchQuery = signal('');
+  filteredKbDocs = computed(() => {
+    const query = this.kbSearchQuery().toLowerCase();
+    if (!query) return this.kbDocs();
+    return this.kbDocs().filter(doc => 
+      doc.title.toLowerCase().includes(query) || 
+      doc.content.toLowerCase().includes(query)
+    );
+  });
   newDocTitle = signal('');
   newDocContent = signal('');
   newDocInstructions = signal('');
@@ -156,15 +174,15 @@ export class App implements OnInit, AfterViewChecked {
       textarea.style.height = 'auto';
     }
 
-    this.messages.update(m => [...m, {role: 'user', text: userMessage}]);
+    this.messages.update(m => [...m, {id: Date.now().toString(), role: 'user', text: userMessage}]);
     this.loading.set(true);
     
     try {
       const response = await this.gemini.chat(userMessage);
-      this.messages.update(m => [...m, {role: 'bot', text: response.text || ''}]);
+      this.messages.update(m => [...m, {id: Date.now().toString(), role: 'bot', text: response.text || ''}]);
     } catch (error) {
       console.error("Error sending message:", error);
-      this.messages.update(m => [...m, {role: 'bot', text: 'Sorry, I encountered an error processing your request.'}]);
+      this.messages.update(m => [...m, {id: Date.now().toString(), role: 'bot', text: 'Sorry, I encountered an error processing your request.'}]);
     } finally {
       this.loading.set(false);
     }
@@ -175,18 +193,19 @@ export class App implements OnInit, AfterViewChecked {
     const file = input.files?.[0];
     if (!file || !this.user()) return;
     
-    this.messages.update(m => [...m, {role: 'user', text: `[Uploaded Image: ${file.name}]`}]);
+    this.messages.update(m => [...m, {id: Date.now().toString(), role: 'user', text: `[Uploaded Image: ${file.name}]`}]);
     this.loading.set(true);
     
     const reader = new FileReader();
     reader.onload = async () => {
       const base64 = (reader.result as string).split(',')[1];
       try {
-        const response = await this.gemini.analyzeImage('Analyze this image in the context of OCIA.', base64, file.type);
-        this.messages.update(m => [...m, {role: 'bot', text: response.text || ''}]);
+        const mimeType = file.type || 'image/jpeg';
+        const response = await this.gemini.analyzeImage('Analyze this image in the context of OCIA.', base64, mimeType);
+        this.messages.update(m => [...m, {id: Date.now().toString(), role: 'bot', text: response.text || ''}]);
       } catch (error) {
         console.error("Error analyzing image:", error);
-        this.messages.update(m => [...m, {role: 'bot', text: 'Sorry, I encountered an error analyzing the image.'}]);
+        this.messages.update(m => [...m, {id: Date.now().toString(), role: 'bot', text: 'Sorry, I encountered an error analyzing the image.'}]);
       } finally {
         this.loading.set(false);
         // Reset input so the same file can be selected again
@@ -255,6 +274,46 @@ export class App implements OnInit, AfterViewChecked {
     } catch (error) {
       console.error("Error generating speech:", error);
     }
+  }
+
+  rateMessage(msgId: string, rating: 'up' | 'down') {
+    this.messages.update(msgs => msgs.map(m => m.id === msgId ? {...m, rating, showFeedbackForm: true} : m));
+  }
+
+  async submitFeedback(msgId: string, comment: string) {
+    const msgs = this.messages();
+    const msgIndex = msgs.findIndex(m => m.id === msgId);
+    if (msgIndex === -1 || !this.user()) return;
+    
+    const msg = msgs[msgIndex];
+    
+    let promptText = '';
+    if (msgIndex > 0 && msgs[msgIndex - 1].role === 'user') {
+      promptText = msgs[msgIndex - 1].text;
+    }
+
+    try {
+      const feedbackData: Record<string, unknown> = {
+        userId: this.user()!.uid,
+        userEmail: this.user()!.email || '',
+        prompt: promptText,
+        response: msg.text,
+        createdAt: Date.now()
+      };
+      if (msg.rating) feedbackData['rating'] = msg.rating;
+      if (comment) feedbackData['comment'] = comment;
+
+      await addDoc(collection(db, 'feedback'), feedbackData);
+      
+      this.messages.update(m => m.map(item => item.id === msgId ? {...item, feedbackSubmitted: true, showFeedbackForm: false} : item));
+    } catch (error) {
+      console.error("Error submitting feedback:", error);
+      alert("Failed to submit feedback. Please try again.");
+    }
+  }
+
+  cancelFeedback(msgId: string) {
+    this.messages.update(msgs => msgs.map(m => m.id === msgId ? {...m, showFeedbackForm: false, rating: undefined} : m));
   }
 
   // Knowledge Base Methods

@@ -31,7 +31,7 @@
             <img src="logo.svg" alt="Cyril Logo" class="w-14 h-14 object-contain" referrerpolicy="no-referrer">
           </div>
           <h2 class="font-sans text-2xl font-bold text-cyril-purple mb-3 tracking-tight">Welcome to Cyril</h2>
-          <p class="font-serif text-stone-500 text-sm mb-8 leading-relaxed max-w-[280px]">Your personal assistant for the Order of Christian Initiation of Adults.</p>
+          <p class="font-serif text-stone-500 text-sm mb-8 leading-relaxed max-w-[280px]">An assistance tool to support the OCIA</p>
           <div class="flex items-center gap-2 text-xs text-stone-400 font-medium uppercase tracking-widest animate-pulse">
             <mat-icon class="!text-[16px] !w-4 !h-4">arrow_upward</mat-icon>
             <span>Sign in above to begin</span>
@@ -112,9 +112,32 @@
                 </div>
                 
                 @if (msg.role === 'bot') {
-                  <button (click)="playSpeech(msg.text)" class="absolute -bottom-3 -right-3 w-7 h-7 bg-white border border-stone-200 rounded-full flex items-center justify-center text-cyril-purple shadow-sm opacity-0 group-hover:opacity-100 transition-opacity hover:bg-stone-50">
-                    <mat-icon class="!text-[14px]">volume_up</mat-icon>
-                  </button>
+                  <div class="flex items-center gap-1 mt-1 opacity-0 group-hover:opacity-100 transition-opacity" [class.opacity-100]="msg.showFeedbackForm || msg.rating">
+                    <button (click)="playSpeech(msg.text)" class="w-6 h-6 rounded-full flex items-center justify-center text-stone-400 hover:text-cyril-purple hover:bg-stone-100 transition-colors" title="Read aloud">
+                      <mat-icon class="!text-[14px]">volume_up</mat-icon>
+                    </button>
+                    @if (!msg.feedbackSubmitted) {
+                      <button (click)="rateMessage(msg.id, 'up')" [class]="'w-6 h-6 rounded-full flex items-center justify-center transition-colors ' + (msg.rating === 'up' ? 'text-green-600 bg-green-50' : 'text-stone-400 hover:text-green-600 hover:bg-stone-100')" title="Good response">
+                        <mat-icon class="!text-[14px]">thumb_up</mat-icon>
+                      </button>
+                      <button (click)="rateMessage(msg.id, 'down')" [class]="'w-6 h-6 rounded-full flex items-center justify-center transition-colors ' + (msg.rating === 'down' ? 'text-red-600 bg-red-50' : 'text-stone-400 hover:text-red-600 hover:bg-stone-100')" title="Bad response">
+                        <mat-icon class="!text-[14px]">thumb_down</mat-icon>
+                      </button>
+                    } @else {
+                      <span class="text-[10px] text-stone-400 ml-1">Feedback submitted</span>
+                    }
+                  </div>
+                  
+                  @if (msg.showFeedbackForm) {
+                    <div class="mt-2 bg-white border border-stone-200 rounded-xl p-3 shadow-sm">
+                      <p class="text-[10px] uppercase tracking-wider font-bold text-stone-500 mb-2">Provide additional feedback (optional)</p>
+                      <textarea #feedbackInput placeholder="What could be improved?" class="w-full bg-stone-50 border border-stone-200 rounded-lg px-2 py-1.5 outline-none focus:ring-2 focus:ring-cyril-purple/30 focus:border-cyril-purple/50 transition-all text-xs min-h-[60px] resize-y mb-2"></textarea>
+                      <div class="flex justify-end gap-2">
+                        <button (click)="cancelFeedback(msg.id)" class="text-xs text-stone-500 hover:text-stone-700 font-medium px-2 py-1">Cancel</button>
+                        <button (click)="submitFeedback(msg.id, feedbackInput.value)" class="text-xs bg-cyril-purple text-white px-3 py-1 rounded-md font-medium hover:bg-cyril-purple/90 transition-colors">Submit</button>
+                      </div>
+                    </div>
+                  }
                 }
               </div>
             </div>
@@ -137,6 +160,13 @@
             <div class="flex items-center justify-between bg-white p-4 rounded-2xl shadow-sm border border-stone-200">
               <h2 class="font-serif text-lg font-semibold text-cyril-purple">Knowledge Base</h2>
               <p class="font-sans text-xs font-medium text-stone-500 bg-stone-100 px-2 py-1 rounded-md">{{kbDocs().length}} docs</p>
+            </div>
+            
+            <div class="bg-white border border-stone-200 rounded-2xl p-4 shadow-sm">
+              <div class="relative">
+                <mat-icon class="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 !text-[18px]">search</mat-icon>
+                <input type="text" [(ngModel)]="kbSearchQuery" placeholder="Search documents by title or content..." class="w-full bg-stone-50 border border-stone-200 rounded-lg pl-10 pr-4 py-2 outline-none focus:ring-2 focus:ring-cyril-purple/30 focus:border-cyril-purple/50 transition-all text-sm">
+              </div>
             </div>
             
             @if (isAdmin()) {
@@ -166,7 +196,7 @@
             }
             
             <div class="grid gap-3">
-              @for (doc of kbDocs(); track doc.id) {
+              @for (doc of filteredKbDocs(); track doc.id) {
                 <div class="bg-white border border-stone-200 rounded-2xl p-4 shadow-sm flex flex-col gap-2">
                   <div class="flex items-start justify-between">
                     <h4 class="font-semibold text-sm text-stone-900">{{doc.title}}</h4>
@@ -187,7 +217,7 @@
                   </div>
                 </div>
               }
-              @if (kbDocs().length === 0) {
+              @if (filteredKbDocs().length === 0) {
                 <div class="text-center py-8 text-stone-500 bg-white border border-stone-200 border-dashed rounded-2xl">
                   <mat-icon class="!text-3xl mb-1 opacity-50">description</mat-icon>
                   <p class="font-serif text-sm">No documents found.</p>
