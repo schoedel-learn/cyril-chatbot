@@ -1,0 +1,45 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Firebase Auth UID" },
+        "email": { "type": "string", "description": "User email" },
+        "role": { "type": "string", "description": "User role (e.g., admin)" },
+        "firstName": { "type": "string", "description": "First name" },
+        "lastName": { "type": "string", "description": "Last name" },
+        "parishName": { "type": "string", "description": "Parish name" },
+        "phone": { "type": "string", "description": "Phone number (optional)" },
+        "diocese": { "type": "string", "description": "Diocese" },
+        "otherDiocese": { "type": "string", "description": "Other diocese (optional)" },
+        "profileCompleted": { "type": "boolean", "description": "Whether profile is complete" }
+      },
+      "required": ["uid", "email"]
+    },
+    "KnowledgeDocument": {
+      "title": "Knowledge Document",
+      "description": "A document providing specific info for OCIA",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "description": "Document title" },
+        "content": { "type": "string", "description": "Document text content" },
+        "instructions": { "type": "string", "description": "Specific instructions for the AI on how to use this document" },
+        "createdAt": { "type": "number", "description": "Creation timestamp" },
+        "authorUid": { "type": "string", "description": "UID of the user who uploaded it" }
+      },
+      "required": ["title", "content", "createdAt", "authorUid"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "User" },
+      "description": "User profile and credit balance"
+    },
+    "/knowledge_base/{docId}": {
+      "schema": { "$ref": "KnowledgeDocument" },
+      "description": "Knowledge base documents for OCIA"
+    }
+  }
+}

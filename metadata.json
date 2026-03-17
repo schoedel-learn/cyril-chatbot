@@ -1,0 +1,5 @@
+{
+  "name": "OCIA Assistance Tool",
+  "description": "Cyril: An AI assistant for Catholic.Work, helping with the Order of Christian Initiation of Adults (OCIA) process.",
+  "requestFramePermissions": ["camera", "microphone"]
+}
