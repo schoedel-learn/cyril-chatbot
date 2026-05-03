@@ -136,6 +136,10 @@
               {{useDeepThink() ? 'Deep Think' : 'Flash'}}
             </button>
           </div>
+          <button (click)="exportChat()" class="text-xs font-bold text-stone-500 bg-white border border-stone-200 px-3 py-1.5 rounded-full hover:bg-stone-100 transition-colors flex items-center gap-1.5 ml-auto">
+              <mat-icon class="!text-sm">download</mat-icon>
+              Export
+          </button>
         </div>
         @for (msg of messages(); track $index) {
           <div class="flex gap-3 sm:gap-4 w-full" [class.flex-row-reverse]="msg.role === 'user'">

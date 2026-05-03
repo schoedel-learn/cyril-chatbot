@@ -337,6 +337,22 @@ export class App implements OnInit, AfterViewChecked {
     });
   }
 
+  exportChat() {
+    if (this.messages().length === 0) return;
+    let text = 'Chat Export - Cyril Assistant\n';
+    text += `Date: ${new Date().toLocaleString()}\n\n`;
+    this.messages().forEach(msg => {
+      text += `${msg.role.toUpperCase()}: ${msg.text}\n\n`;
+    });
+    const blob = new Blob([text], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `cyril-chat-export-${Date.now()}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   async addNewMemory(newNote: string) {
     if (!this.user()) return;
     const memoryDocRef = doc(db, 'users', this.user()!.uid, 'memory', 'current');
