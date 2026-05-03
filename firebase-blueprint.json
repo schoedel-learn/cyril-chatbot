@@ -1,5 +1,19 @@
 {
   "entities": {
+    "Parish": {
+      "title": "Parish",
+      "description": "Parish subscription and location",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Parish name" },
+        "address": { "type": "string", "description": "Physical address" },
+        "placeId": { "type": "string", "description": "Google Maps Place ID, if applicable" },
+        "lat": { "type": "number", "description": "Latitude" },
+        "lng": { "type": "number", "description": "Longitude" },
+        "adminIds": { "type": "array", "description": "UIDs of parish admins"}
+      },
+      "required": ["name", "address"]
+    },
     "User": {
       "title": "User",
       "description": "User profile",
@@ -11,6 +25,7 @@
         "firstName": { "type": "string", "description": "First name" },
         "lastName": { "type": "string", "description": "Last name" },
         "parishName": { "type": "string", "description": "Parish name" },
+        "parishId": { "type": "string", "description": "Parish ID for multi-tenant linking" },
         "phone": { "type": "string", "description": "Phone number (optional)" },
         "diocese": { "type": "string", "description": "Diocese" },
         "otherDiocese": { "type": "string", "description": "Other diocese (optional)" },
@@ -71,6 +86,10 @@
     }
   },
   "firestore": {
+    "/parishes/{parishId}": {
+      "schema": { "$ref": "Parish" },
+      "description": "Parish subscriptions and locations"
+    },
     "/users/{userId}": {
       "schema": { "$ref": "User" },
       "description": "User profile"

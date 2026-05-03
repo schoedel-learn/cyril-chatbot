@@ -123,6 +123,18 @@ Your goal is to support his unique diaconal ministry within the OCIA.
     return await chat.sendMessage({ message: prompt });
   }
 
+  async searchParishes(prompt: string): Promise<string> {
+    const chat = this.ai.chats.create({
+      model: 'gemini-3.1-pro-preview',
+      config: { 
+        tools: [{ googleSearch: {} }],
+        temperature: 0.1
+      },
+    });
+    const response = await chat.sendMessage({ message: prompt });
+    return response.text || "[]";
+  }
+
   async analyzeImage(prompt: string, base64Image: string, mimeType: string) {
     return await this.ai.models.generateContent({
       model: 'gemini-3.1-pro-preview',

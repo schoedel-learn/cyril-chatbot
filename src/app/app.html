@@ -1,341 +1,716 @@
-<div class="h-[100dvh] w-full flex flex-col font-sans bg-stone-50 text-stone-900 selection:bg-cyril-purple/20">
-  
+<div
+  class="h-[100dvh] w-full flex flex-col font-sans bg-stone-50 text-stone-900 selection:bg-cyril-purple/20"
+>
   <!-- Header -->
-  <header class="px-4 py-3 sm:px-6 sm:py-4 border-b border-stone-200 bg-white/80 backdrop-blur-md sticky top-0 z-20 flex items-center justify-between shrink-0 shadow-sm">
+  <header
+    class="px-4 py-3 sm:px-6 sm:py-4 border-b border-stone-200 bg-white/80 backdrop-blur-md sticky top-0 z-20 flex items-center justify-between shrink-0 shadow-sm"
+  >
     <div class="flex items-center gap-3">
-      <img src="logo.svg" alt="Logo" class="h-8 sm:h-10 w-auto object-contain" referrerpolicy="no-referrer">
-      <h1 class="font-sans text-xl sm:text-2xl font-extrabold text-cyril-purple leading-tight tracking-tight">Cyril</h1>
+      <img
+        src="logo.svg"
+        alt="Logo"
+        class="h-8 sm:h-10 w-auto object-contain"
+        referrerpolicy="no-referrer"
+      />
+      <h1
+        class="font-sans text-xl sm:text-2xl font-extrabold text-cyril-purple leading-tight tracking-tight"
+      >
+        Cyril
+      </h1>
     </div>
     <div class="flex items-center gap-3 sm:gap-4">
       @if (user()) {
-        <div class="flex bg-stone-100/80 rounded-full p-1 shadow-inner border border-stone-200/50 hidden sm:flex">
-          <button (click)="view.set('chat')" [class]="'px-4 py-1.5 text-xs uppercase tracking-widest font-bold rounded-full transition-all ' + (view() === 'chat' ? 'bg-white text-cyril-purple shadow-sm ring-1 ring-stone-200/50' : 'text-stone-500 hover:text-stone-700')">Chat</button>
-          <button (click)="view.set('kb')" [class]="'px-4 py-1.5 text-xs uppercase tracking-widest font-bold rounded-full transition-all ' + (view() === 'kb' ? 'bg-white text-cyril-purple shadow-sm ring-1 ring-stone-200/50' : 'text-stone-500 hover:text-stone-700')">Knowledge Base</button>
-        </div>
-        <div class="flex bg-stone-100/80 rounded-full p-1 shadow-inner sm:hidden">
-            <button (click)="view.set('chat')" [class]="'px-3 py-1.5 text-[10px] uppercase tracking-wider font-bold rounded-full transition-all ' + (view() === 'chat' ? 'bg-white text-cyril-purple shadow-sm' : 'text-stone-500 hover:text-stone-700')">Chat</button>
-            <button (click)="view.set('kb')" [class]="'px-3 py-1.5 text-[10px] uppercase tracking-wider font-bold rounded-full transition-all ' + (view() === 'kb' ? 'bg-white text-cyril-purple shadow-sm' : 'text-stone-500 hover:text-stone-700')">Docs</button>
-        </div>
-        
-        <div class="flex items-center gap-3 group animate-in fade-in slide-in-from-right-4 duration-500">
-          @if (profileCompleted()) {
-            <button (click)="profileCompleted.set(false)" class="flex flex-col items-end mr-1 hover:opacity-80 transition-opacity hidden sm:flex">
-              <span class="text-[9px] font-bold text-stone-400 uppercase tracking-widest leading-none mb-1">Role</span>
-              <span class="text-xs font-bold text-cyril-purple bg-cyril-purple/5 px-2.5 py-1 rounded-full border border-cyril-purple/10 leading-none">{{userRole()}}</span>
-            </button>
-          }
-          <button class="w-8 h-8 sm:w-10 sm:h-10 rounded-full overflow-hidden border-2 border-white shadow-sm ring-1 ring-stone-200 flex-shrink-0">
-            <img [src]="user()?.photoURL || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + user()?.uid" alt="Avatar" class="w-full h-full object-cover">
-          </button>
-        </div>
+      <div
+        class="flex bg-stone-100/80 rounded-full p-1 shadow-inner border border-stone-200/50 hidden sm:flex"
+      >
+        <button
+          (click)="view.set('chat')"
+          [class]="'px-4 py-1.5 text-xs uppercase tracking-widest font-bold rounded-full transition-all ' + (view() === 'chat' ? 'bg-white text-cyril-purple shadow-sm ring-1 ring-stone-200/50' : 'text-stone-500 hover:text-stone-700')"
+        >
+          Chat
+        </button>
+        <button
+          (click)="view.set('kb')"
+          [class]="'px-4 py-1.5 text-xs uppercase tracking-widest font-bold rounded-full transition-all ' + (view() === 'kb' ? 'bg-white text-cyril-purple shadow-sm ring-1 ring-stone-200/50' : 'text-stone-500 hover:text-stone-700')"
+        >
+          Knowledge Base
+        </button>
+        <button
+          (click)="view.set('map')"
+          [class]="'px-4 py-1.5 text-xs uppercase tracking-widest font-bold rounded-full transition-all ' + (view() === 'map' ? 'bg-white text-cyril-purple shadow-sm ring-1 ring-stone-200/50' : 'text-stone-500 hover:text-stone-700')"
+        >
+          Parish Map
+        </button>
+      </div>
+      <div class="flex bg-stone-100/80 rounded-full p-1 shadow-inner sm:hidden">
+        <button
+          (click)="view.set('chat')"
+          [class]="'px-3 py-1.5 text-[10px] uppercase tracking-wider font-bold rounded-full transition-all ' + (view() === 'chat' ? 'bg-white text-cyril-purple shadow-sm' : 'text-stone-500 hover:text-stone-700')"
+        >
+          Chat
+        </button>
+        <button
+          (click)="view.set('kb')"
+          [class]="'px-3 py-1.5 text-[10px] uppercase tracking-wider font-bold rounded-full transition-all ' + (view() === 'kb' ? 'bg-white text-cyril-purple shadow-sm' : 'text-stone-500 hover:text-stone-700')"
+        >
+          Docs
+        </button>
+        <button
+          (click)="view.set('map')"
+          [class]="'px-3 py-1.5 text-[10px] uppercase tracking-wider font-bold rounded-full transition-all ' + (view() === 'map' ? 'bg-white text-cyril-purple shadow-sm' : 'text-stone-500 hover:text-stone-700')"
+        >
+          Map
+        </button>
+      </div>
+
+      <div
+        class="flex items-center gap-3 group animate-in fade-in slide-in-from-right-4 duration-500"
+      >
+        @if (profileCompleted()) {
+        <button
+          (click)="profileCompleted.set(false)"
+          class="flex flex-col items-end mr-1 hover:opacity-80 transition-opacity hidden sm:flex"
+        >
+          <span
+            class="text-[9px] font-bold text-stone-400 uppercase tracking-widest leading-none mb-1"
+            >Role</span
+          >
+          <span
+            class="text-xs font-bold text-cyril-purple bg-cyril-purple/5 px-2.5 py-1 rounded-full border border-cyril-purple/10 leading-none"
+            >{{userRole()}}</span
+          >
+        </button>
+        }
+        <button
+          class="w-8 h-8 sm:w-10 sm:h-10 rounded-full overflow-hidden border-2 border-white shadow-sm ring-1 ring-stone-200 flex-shrink-0"
+        >
+          <img
+            [src]="user()?.photoURL || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + user()?.uid"
+            alt="Avatar"
+            class="w-full h-full object-cover"
+          />
+        </button>
+      </div>
       } @else {
-        <button (click)="signIn()" class="text-sm font-semibold text-white bg-cyril-purple hover:bg-cyril-purple/90 transition-colors px-5 py-2.5 rounded-full shadow-md">Sign In</button>
+      <button
+        (click)="signIn()"
+        class="text-sm font-semibold text-white bg-cyril-purple hover:bg-cyril-purple/90 transition-colors px-5 py-2.5 rounded-full shadow-md"
+      >
+        Sign In
+      </button>
       }
     </div>
   </header>
 
   <!-- Main Content -->
-  <main #scrollContainer class="flex-grow overflow-y-auto w-full relative scroll-smooth flex flex-col items-center">
+  <main
+    #scrollContainer
+    class="flex-grow overflow-y-auto w-full relative scroll-smooth flex flex-col items-center"
+  >
     @if (!user()) {
-      <!-- Welcome Screen -->
-      <div class="flex-grow w-full max-w-3xl flex flex-col items-center justify-center text-center p-6">
-        <div class="w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-white flex items-center justify-center mb-8 overflow-hidden shadow-xl ring-1 ring-stone-200/50">
-          <img src="logo.svg" alt="Cyril Logo" class="w-16 h-16 sm:w-20 sm:h-20 object-contain" referrerpolicy="no-referrer">
-        </div>
-        <h2 class="font-sans text-3xl sm:text-4xl font-extrabold text-cyril-purple mb-4 tracking-tight">Welcome to Cyril</h2>
-        <p class="font-serif text-stone-500 text-base sm:text-lg mb-10 leading-relaxed max-w-md">An intelligent pastoral and catechetical assistant for the Order of Christian Initiation of Adults.</p>
-        <div class="flex flex-col items-center gap-3 text-sm text-stone-400 font-medium uppercase tracking-widest animate-pulse">
-          <mat-icon class="!text-[24px] !w-6 !h-6">arrow_upward</mat-icon>
-          <span>Sign in above to begin</span>
-        </div>
+    <!-- Welcome Screen -->
+    <div
+      class="flex-grow w-full max-w-3xl flex flex-col items-center justify-center text-center p-6"
+    >
+      <div
+        class="w-28 h-28 sm:w-32 sm:h-32 rounded-full bg-white flex items-center justify-center mb-8 overflow-hidden shadow-xl ring-1 ring-stone-200/50"
+      >
+        <img
+          src="logo.svg"
+          alt="Cyril Logo"
+          class="w-16 h-16 sm:w-20 sm:h-20 object-contain"
+          referrerpolicy="no-referrer"
+        />
       </div>
+      <h2
+        class="font-sans text-3xl sm:text-4xl font-extrabold text-cyril-purple mb-4 tracking-tight"
+      >
+        Welcome to Cyril
+      </h2>
+      <p
+        class="font-serif text-stone-500 text-base sm:text-lg mb-10 leading-relaxed max-w-md"
+      >
+        An intelligent pastoral and catechetical assistant for the Order of
+        Christian Initiation of Adults.
+      </p>
+      <div
+        class="flex flex-col items-center gap-3 text-sm text-stone-400 font-medium uppercase tracking-widest animate-pulse"
+      >
+        <mat-icon class="!text-[24px] !w-6 !h-6">arrow_upward</mat-icon>
+        <span>Sign in above to begin</span>
+      </div>
+    </div>
     } @else if (!profileCompleted()) {
-      <!-- Profile Form -->
-      <div class="flex-grow w-full px-4 py-8 flex justify-center items-center">
-        <div class="bg-white border border-stone-200 rounded-[2rem] p-6 sm:p-10 shadow-xl w-full max-w-xl">
-          <h2 class="font-serif text-2xl sm:text-3xl font-semibold text-cyril-purple mb-2 text-center">Your Profile</h2>
-          <p class="font-serif text-stone-500 text-sm text-center mb-8">Tell us a bit about yourself so Cyril can tailor the experience.</p>
-          
-          <div class="flex flex-col gap-5">
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <div>
-                <label for="firstName" class="block text-xs uppercase tracking-wider font-bold text-stone-500 mb-1.5">First Name *</label>
-                <input id="firstName" [(ngModel)]="firstName" type="text" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-cyril-purple/30 focus:border-cyril-purple/50 transition-all text-sm">
-              </div>
-              <div>
-                <label for="lastName" class="block text-xs uppercase tracking-wider font-bold text-stone-500 mb-1.5">Last Name *</label>
-                <input id="lastName" [(ngModel)]="lastName" type="text" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-cyril-purple/30 focus:border-cyril-purple/50 transition-all text-sm">
-              </div>
-            </div>
-            
-            <div>
-              <label for="parishName" class="block text-xs uppercase tracking-wider font-bold text-stone-500 mb-1.5">Parish Name *</label>
-              <input id="parishName" [(ngModel)]="parishName" type="text" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-cyril-purple/30 focus:border-cyril-purple/50 transition-all text-sm">
-            </div>
-            
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <div>
-                  <label for="email" class="block text-xs uppercase tracking-wider font-bold text-stone-500 mb-1.5">Email *</label>
-                  <input id="email" [(ngModel)]="email" type="email" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-cyril-purple/30 focus:border-cyril-purple/50 transition-all text-sm">
-                </div>
-                <div>
-                  <label for="phone" class="block text-xs uppercase tracking-wider font-bold text-stone-500 mb-1.5">Phone (Optional)</label>
-                  <input id="phone" [(ngModel)]="phone" type="tel" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-cyril-purple/30 focus:border-cyril-purple/50 transition-all text-sm">
-                </div>
-            </div>
-            
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <div>
-                  <label for="diocese" class="block text-xs uppercase tracking-wider font-bold text-stone-500 mb-1.5">Diocese *</label>
-                  <select id="diocese" [(ngModel)]="selectedDiocese" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-cyril-purple/30 focus:border-cyril-purple/50 transition-all text-sm">
-                    <option value="" disabled selected>Select your diocese...</option>
-                    @for (diocese of dioceses; track diocese) {
-                      <option [value]="diocese">{{diocese}}</option>
-                    }
-                  </select>
-                </div>
-                
-                @if (selectedDiocese() === 'Other') {
-                  <div class="animate-in fade-in zoom-in duration-300">
-                    <label for="otherDiocese" class="block text-xs uppercase tracking-wider font-bold text-stone-500 mb-1.5">Specify Diocese *</label>
-                    <input id="otherDiocese" [(ngModel)]="otherDiocese" type="text" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-cyril-purple/30 focus:border-cyril-purple/50 transition-all text-sm">
-                  </div>
-                }
-            </div>
+    <!-- Profile Form -->
+    <div class="flex-grow w-full px-4 py-8 flex justify-center items-center">
+      <div
+        class="bg-white border border-stone-200 rounded-[2rem] p-6 sm:p-10 shadow-xl w-full max-w-xl"
+      >
+        <h2
+          class="font-serif text-2xl sm:text-3xl font-semibold text-cyril-purple mb-2 text-center"
+        >
+          Your Profile
+        </h2>
+        <p class="font-serif text-stone-500 text-sm text-center mb-8">
+          Tell us a bit about yourself so Cyril can tailor the experience.
+        </p>
 
-            <div class="mt-2">
-              <label for="role" class="block text-xs uppercase tracking-wider font-bold text-stone-500 mb-1.5">Your Role in OCIA *</label>
-              <select id="role" [(ngModel)]="selectedRole" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-cyril-purple/30 focus:border-cyril-purple/50 transition-all text-sm">
-                @for (role of roles; track role.value) {
-                  <option [value]="role.value">{{role.label}}</option>
+        <div class="flex flex-col gap-5">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div>
+              <label
+                for="firstName"
+                class="block text-xs uppercase tracking-wider font-bold text-stone-500 mb-1.5"
+                >First Name *</label
+              >
+              <input
+                id="firstName"
+                [(ngModel)]="firstName"
+                type="text"
+                class="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-cyril-purple/30 focus:border-cyril-purple/50 transition-all text-sm"
+              />
+            </div>
+            <div>
+              <label
+                for="lastName"
+                class="block text-xs uppercase tracking-wider font-bold text-stone-500 mb-1.5"
+                >Last Name *</label
+              >
+              <input
+                id="lastName"
+                [(ngModel)]="lastName"
+                type="text"
+                class="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-cyril-purple/30 focus:border-cyril-purple/50 transition-all text-sm"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label
+              for="parishName"
+              class="block text-xs uppercase tracking-wider font-bold text-stone-500 mb-1.5"
+              >Parish Name *</label
+            >
+            <input
+              id="parishName"
+              [(ngModel)]="parishName"
+              type="text"
+              class="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-cyril-purple/30 focus:border-cyril-purple/50 transition-all text-sm"
+            />
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div>
+              <label
+                for="email"
+                class="block text-xs uppercase tracking-wider font-bold text-stone-500 mb-1.5"
+                >Email *</label
+              >
+              <input
+                id="email"
+                [(ngModel)]="email"
+                type="email"
+                class="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-cyril-purple/30 focus:border-cyril-purple/50 transition-all text-sm"
+              />
+            </div>
+            <div>
+              <label
+                for="phone"
+                class="block text-xs uppercase tracking-wider font-bold text-stone-500 mb-1.5"
+                >Phone (Optional)</label
+              >
+              <input
+                id="phone"
+                [(ngModel)]="phone"
+                type="tel"
+                class="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-cyril-purple/30 focus:border-cyril-purple/50 transition-all text-sm"
+              />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div>
+              <label
+                for="diocese"
+                class="block text-xs uppercase tracking-wider font-bold text-stone-500 mb-1.5"
+                >Diocese *</label
+              >
+              <select
+                id="diocese"
+                [(ngModel)]="selectedDiocese"
+                class="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-cyril-purple/30 focus:border-cyril-purple/50 transition-all text-sm"
+              >
+                <option value="" disabled selected>
+                  Select your diocese...
+                </option>
+                @for (diocese of dioceses; track diocese) {
+                <option [value]="diocese">{{diocese}}</option>
                 }
               </select>
-              <p class="text-xs text-stone-400 mt-2 font-medium">This fundamentally shapes how Cyril communicates with you.</p>
             </div>
-            
-            <button (click)="submitProfile()" [disabled]="profileLoading() || !firstName().trim() || !lastName().trim() || !parishName().trim() || !selectedDiocese() || !selectedRole()" class="mt-6 bg-cyril-purple text-white px-6 py-4 rounded-xl text-base font-bold shadow-lg hover:bg-cyril-purple/90 transition-all disabled:opacity-50 flex items-center justify-center gap-3">
-              @if (profileLoading()) {
-                <mat-icon class="animate-spin !text-xl">sync</mat-icon>
+
+            @if (selectedDiocese() === 'Other') {
+            <div class="animate-in fade-in zoom-in duration-300">
+              <label
+                for="otherDiocese"
+                class="block text-xs uppercase tracking-wider font-bold text-stone-500 mb-1.5"
+                >Specify Diocese *</label
+              >
+              <input
+                id="otherDiocese"
+                [(ngModel)]="otherDiocese"
+                type="text"
+                class="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-cyril-purple/30 focus:border-cyril-purple/50 transition-all text-sm"
+              />
+            </div>
+            }
+          </div>
+
+          <div class="mt-2">
+            <label
+              for="role"
+              class="block text-xs uppercase tracking-wider font-bold text-stone-500 mb-1.5"
+              >Your Role in OCIA *</label
+            >
+            <select
+              id="role"
+              [(ngModel)]="selectedRole"
+              class="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-cyril-purple/30 focus:border-cyril-purple/50 transition-all text-sm"
+            >
+              @for (role of roles; track role.value) {
+              <option [value]="role.value">{{role.label}}</option>
               }
-              Complete Setup
-            </button>
+            </select>
+            <p class="text-xs text-stone-400 mt-2 font-medium">
+              This fundamentally shapes how Cyril communicates with you.
+            </p>
           </div>
-        </div>
-      </div>
-    } @else {
-      @if (view() === 'chat') {
-        <div class="w-full max-w-4xl px-4 py-6 sm:py-8 flex flex-col gap-6 sm:gap-8">
-        <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
-          <span class="text-xs font-bold text-stone-500 uppercase tracking-widest mr-2 shrink-0">Focus:</span>
-          @for (period of OCIA_PERIODS; track period) {
-            <button (click)="selectedPeriod.set(period)" [class]="'px-3 py-1.5 text-xs font-bold rounded-full transition-all whitespace-nowrap ' + (selectedPeriod() === period ? 'bg-cyril-purple text-white shadow-md' : 'bg-white text-stone-600 border border-stone-200 hover:bg-stone-100')">{{period}}</button>
-          }
-          <div class="border-l border-stone-200 pl-2 ml-2">
-            <button (click)="useDeepThink.set(!useDeepThink())" [class]="'px-3 py-1.5 text-xs font-bold rounded-full transition-all whitespace-nowrap flex items-center gap-1 ' + (useDeepThink() ? 'bg-amber-500 text-white' : 'bg-stone-100 text-stone-600')">
-              <mat-icon class="!text-sm">{{useDeepThink() ? 'psychology' : 'bolt'}}</mat-icon>
-              {{useDeepThink() ? 'Deep Think' : 'Flash'}}
-            </button>
-          </div>
-          <button (click)="exportChat()" class="text-xs font-bold text-stone-500 bg-white border border-stone-200 px-3 py-1.5 rounded-full hover:bg-stone-100 transition-colors flex items-center gap-1.5 ml-auto">
-              <mat-icon class="!text-sm">download</mat-icon>
-              Export
+
+          <button
+            (click)="submitProfile()"
+            [disabled]="profileLoading() || !firstName().trim() || !lastName().trim() || !parishName().trim() || !selectedDiocese() || !selectedRole()"
+            class="mt-6 bg-cyril-purple text-white px-6 py-4 rounded-xl text-base font-bold shadow-lg hover:bg-cyril-purple/90 transition-all disabled:opacity-50 flex items-center justify-center gap-3"
+          >
+            @if (profileLoading()) {
+            <mat-icon class="animate-spin !text-xl">sync</mat-icon>
+            } Complete Setup
           </button>
         </div>
-        @for (msg of messages(); track $index) {
-          <div class="flex gap-3 sm:gap-4 w-full" [class.flex-row-reverse]="msg.role === 'user'">
-            <div class="shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shadow-sm mt-1 border" 
-                 [class]="msg.role === 'user' ? 'bg-stone-100 text-stone-500 border-stone-200/50' : 'bg-white text-cyril-purple border-cyril-purple/20'">
-              @if (msg.role === 'user') {
-                 <img [src]="user()?.photoURL || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + user()?.uid" alt="Avatar" class="w-full h-full object-cover rounded-full">
-              } @else {
-                  <img src="logo.svg" alt="Cyril" class="w-5 h-5 sm:w-6 sm:h-6 object-contain">
-              }
-            </div>
-            
-            <div class="group relative max-w-[85%] sm:max-w-[75%]">
-              <div [class]="'p-4 sm:p-5 text-sm sm:text-base leading-relaxed shadow-sm transition-all ' + (msg.role === 'user' ? 'bg-cyril-purple text-white rounded-3xl rounded-tr-md' : 'bg-white border border-stone-200/80 text-stone-800 rounded-3xl rounded-tl-md')">
-                <p class="whitespace-pre-wrap">{{msg.text}}</p>
-              </div>
-              
-              @if (msg.role === 'bot') {
-                <div class="flex items-center gap-2 mt-2 opacity-0 group-hover:opacity-100 transition-opacity" [class.opacity-100]="msg.showFeedbackForm || msg.rating">
-                  <button (click)="playSpeech(msg.text)" class="w-8 h-8 rounded-full flex items-center justify-center text-stone-400 hover:text-cyril-purple hover:bg-white shadow-sm ring-1 ring-stone-200/50 transition-all" title="Read aloud">
-                    <mat-icon class="!text-[16px]">volume_up</mat-icon>
-                  </button>
-                  @if (!msg.feedbackSubmitted) {
-                    <button (click)="rateMessage(msg.id, 'up')" [class]="'w-8 h-8 rounded-full flex items-center justify-center shadow-sm ring-1 ring-stone-200/50 transition-all ' + (msg.rating === 'up' ? 'text-green-600 bg-green-50 ring-green-200' : 'text-stone-400 hover:text-green-600 hover:bg-white')" title="Good response">
-                      <mat-icon class="!text-[16px]">thumb_up</mat-icon>
-                    </button>
-                    <button (click)="rateMessage(msg.id, 'down')" [class]="'w-8 h-8 rounded-full flex items-center justify-center shadow-sm ring-1 ring-stone-200/50 transition-all ' + (msg.rating === 'down' ? 'text-red-600 bg-red-50 ring-red-200' : 'text-stone-400 hover:text-red-600 hover:bg-white')" title="Bad response">
-                      <mat-icon class="!text-[16px]">thumb_down</mat-icon>
-                    </button>
-                  } @else {
-                    <span class="text-xs font-semibold text-stone-400 ml-2">Feedback submitted</span>
-                  }
-                </div>
-                
-                @if (msg.showFeedbackForm) {
-                  <div class="mt-3 bg-white border border-stone-200/80 rounded-2xl p-4 shadow-sm animate-in fade-in slide-in-from-top-2">
-                    <p class="text-xs uppercase tracking-wider font-bold text-stone-500 mb-3">Provide additional feedback (optional)</p>
-                    <textarea #feedbackInput placeholder="What could be improved?" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-cyril-purple/30 focus:border-cyril-purple/50 transition-all text-sm min-h-[80px] resize-y mb-3"></textarea>
-                    <div class="flex justify-end gap-3">
-                      <button (click)="cancelFeedback(msg.id)" class="text-sm text-stone-500 hover:text-stone-700 font-medium px-3 py-1.5">Cancel</button>
-                      <button (click)="submitFeedback(msg.id, feedbackInput.value)" class="text-sm bg-cyril-purple text-white px-4 py-1.5 rounded-lg font-bold hover:bg-cyril-purple/90 shadow-sm transition-colors">Submit</button>
-                    </div>
-                  </div>
-                }
-              }
-            </div>
-          </div>
+      </div>
+    </div>
+    } @else { @if (view() === 'chat') {
+    <div
+      class="w-full max-w-4xl px-4 py-6 sm:py-8 flex flex-col gap-6 sm:gap-8"
+    >
+      <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+        <span
+          class="text-xs font-bold text-stone-500 uppercase tracking-widest mr-2 shrink-0"
+          >Focus:</span
+        >
+        @for (period of OCIA_PERIODS; track period) {
+        <button
+          (click)="selectedPeriod.set(period)"
+          [class]="'px-3 py-1.5 text-xs font-bold rounded-full transition-all whitespace-nowrap ' + (selectedPeriod() === period ? 'bg-cyril-purple text-white shadow-md' : 'bg-white text-stone-600 border border-stone-200 hover:bg-stone-100')"
+        >
+          {{period}}
+        </button>
         }
-        
-        @if (loading()) {
-          <div class="flex gap-3 sm:gap-4 w-full mb-4">
-            <div class="shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white text-cyril-purple border border-cyril-purple/20 flex items-center justify-center shadow-sm mt-1">
-               <img src="logo.svg" alt="Cyril" class="w-5 h-5 sm:w-6 sm:h-6 object-contain opacity-50">
-            </div>
-            <div class="bg-white border border-stone-200/80 p-5 rounded-3xl rounded-tl-md shadow-sm flex items-center gap-1.5 h-[52px]">
-              <div class="w-1.5 h-1.5 rounded-full bg-stone-400 typing-dot"></div>
-              <div class="w-1.5 h-1.5 rounded-full bg-stone-400 typing-dot"></div>
-              <div class="w-1.5 h-1.5 rounded-full bg-stone-400 typing-dot"></div>
-            </div>
-          </div>
-        }
+        <div class="border-l border-stone-200 pl-2 ml-2">
+          <button
+            (click)="useDeepThink.set(!useDeepThink())"
+            [class]="'px-3 py-1.5 text-xs font-bold rounded-full transition-all whitespace-nowrap flex items-center gap-1 ' + (useDeepThink() ? 'bg-amber-500 text-white' : 'bg-stone-100 text-stone-600')"
+          >
+            <mat-icon class="!text-sm"
+              >{{useDeepThink() ? 'psychology' : 'bolt'}}</mat-icon
+            >
+            {{useDeepThink() ? 'Deep Think' : 'Flash'}}
+          </button>
         </div>
-      } @else {
-        <!-- Knowledge Base -->
-        <div class="w-full max-w-5xl px-4 py-6 sm:py-8 flex flex-col gap-6">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between bg-white p-5 sm:p-6 rounded-3xl shadow-sm border border-stone-200/80 gap-4">
-            <div>
-                <h2 class="font-sans text-2xl font-bold text-cyril-purple tracking-tight">Knowledge Base</h2>
-                <p class="font-serif text-stone-500 text-sm mt-1">Curated documents that shape Cyril's understanding.</p>
-            </div>
-            <p class="font-sans text-sm font-bold text-stone-600 bg-stone-100 px-3 py-1.5 rounded-lg border border-stone-200/50 tracking-wide">{{kbDocs().length}} docs</p>
-          </div>
-          
-          <div class="bg-white border border-stone-200/80 rounded-3xl p-3 sm:p-4 shadow-sm">
-            <div class="relative">
-              <mat-icon class="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400 !text-xl">search</mat-icon>
-              <input type="text" [(ngModel)]="kbSearchQuery" placeholder="Search documents by title or content..." class="w-full bg-stone-50 border border-stone-200/80 rounded-2xl pl-12 pr-4 py-3 sm:py-4 outline-none focus:ring-2 focus:ring-cyril-purple/30 focus:border-cyril-purple/50 transition-all text-base">
-            </div>
-          </div>
-          
-          @if (isAdmin()) {
-            <div class="bg-white border border-stone-200/80 rounded-3xl p-5 sm:p-6 shadow-sm flex flex-col gap-4">
-              <div class="flex items-center justify-between mb-2 border-b border-stone-100 pb-4">
-                <h3 class="font-bold text-lg text-stone-800 tracking-tight">Add New Document</h3>
-                <button (click)="kbFileInput.click()" class="text-xs uppercase tracking-widest flex items-center gap-2 bg-stone-100 hover:bg-stone-200 text-stone-700 px-4 py-2 rounded-xl transition-colors border border-stone-200 font-bold shadow-sm">
-                  <mat-icon class="!text-[18px] leading-none">upload_file</mat-icon>
-                  Upload File
-                </button>
-                <input type="file" accept=".txt,.md" class="hidden" (change)="onKbFileSelected($event)" #kbFileInput>
-              </div>
-              <div class="grid gap-4">
-                  <input [(ngModel)]="newDocTitle" placeholder="Document Title" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-cyril-purple/30 focus:border-cyril-purple/50 transition-all text-sm font-medium">
-                  <textarea [(ngModel)]="newDocContent" placeholder="Paste document content here..." class="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-cyril-purple/30 focus:border-cyril-purple/50 transition-all text-sm min-h-[120px] resize-y"></textarea>
-                  <textarea [(ngModel)]="newDocInstructions" placeholder="AI Instructions (Optional)... How should Cyril use this document?" class="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-cyril-purple/30 focus:border-cyril-purple/50 transition-all text-sm min-h-[80px] resize-y"></textarea>
-              </div>
-              <div class="flex justify-end mt-2">
-                <button (click)="addKnowledgeDoc()" [disabled]="kbLoading() || !newDocTitle().trim() || !newDocContent().trim()" class="bg-cyril-purple text-white px-6 py-2.5 rounded-xl text-sm font-bold shadow-md hover:bg-cyril-purple/90 transition-colors disabled:opacity-50 flex items-center gap-2">
-                  @if (kbLoading()) {
-                    <mat-icon class="animate-spin !text-[18px]">sync</mat-icon>
-                  } @else {
-                    <mat-icon class="!text-[18px]">add</mat-icon>
-                  }
-                  Save Document
-                </button>
-              </div>
-            </div>
+        <button
+          (click)="exportChat()"
+          class="text-xs font-bold text-stone-500 bg-white border border-stone-200 px-3 py-1.5 rounded-full hover:bg-stone-100 transition-colors flex items-center gap-1.5 ml-auto"
+        >
+          <mat-icon class="!text-sm">download</mat-icon>
+          Export
+        </button>
+      </div>
+      @for (msg of messages(); track $index) {
+      <div
+        class="flex gap-3 sm:gap-4 w-full"
+        [class.flex-row-reverse]="msg.role === 'user'"
+      >
+        <div
+          class="shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shadow-sm mt-1 border"
+          [class]="msg.role === 'user' ? 'bg-stone-100 text-stone-500 border-stone-200/50' : 'bg-white text-cyril-purple border-cyril-purple/20'"
+        >
+          @if (msg.role === 'user') {
+          <img
+            [src]="user()?.photoURL || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + user()?.uid"
+            alt="Avatar"
+            class="w-full h-full object-cover rounded-full"
+          />
+          } @else {
+          <img
+            src="logo.svg"
+            alt="Cyril"
+            class="w-5 h-5 sm:w-6 sm:h-6 object-contain"
+          />
           }
-          
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 pb-10">
-            @for (doc of filteredKbDocs(); track doc.id) {
-              <div class="bg-white border border-stone-200/80 rounded-3xl p-5 sm:p-6 shadow-sm flex flex-col gap-3 group relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-1 h-full bg-cyril-purple/20"></div>
-                <div class="flex items-start justify-between">
-                  <h4 class="font-bold text-base sm:text-lg text-stone-900 pr-8 tracking-tight">{{doc.title}}</h4>
-                  @if (isAdmin()) {
-                    <button (click)="deleteKnowledgeDoc(doc.id)" class="text-stone-300 hover:text-red-500 transition-colors bg-white rounded-full p-1" title="Delete Document">
-                      <mat-icon class="!text-[20px]">delete_outline</mat-icon>
-                    </button>
-                  }
-                </div>
-                <p class="font-mono text-[11px] text-stone-400 uppercase tracking-widest">Added {{doc.createdAt | date:'mediumDate'}}</p>
-                @if (doc.instructions) {
-                  <div class="mt-2 text-xs text-cyril-purple bg-cyril-purple/5 p-3 sm:p-4 rounded-xl border border-cyril-purple/10">
-                    <strong class="font-bold uppercase tracking-wider text-[10px] block mb-1">Instructions</strong>
-                    {{doc.instructions}}
-                  </div>
-                }
-                <div class="mt-2 text-sm text-stone-600 bg-stone-50 p-3 sm:p-4 rounded-xl border border-stone-100 max-h-48 overflow-y-auto whitespace-pre-wrap leading-relaxed font-serif">
-                  {{doc.content}}
-                </div>
-              </div>
-            }
-            @if (filteredKbDocs().length === 0) {
-              <div class="text-center py-16 text-stone-400 bg-white border border-stone-200/80 border-dashed rounded-3xl col-span-full">
-                <mat-icon class="!text-5xl mb-3 opacity-30">description</mat-icon>
-                <p class="font-sans font-medium text-base tracking-wide">No documents found.</p>
-              </div>
+        </div>
+
+        <div class="group relative max-w-[85%] sm:max-w-[75%]">
+          <div
+            [class]="'p-4 sm:p-5 text-sm sm:text-base leading-relaxed shadow-sm transition-all ' + (msg.role === 'user' ? 'bg-cyril-purple text-white rounded-3xl rounded-tr-md' : 'bg-white border border-stone-200/80 text-stone-800 rounded-3xl rounded-tl-md')"
+          >
+            <p class="whitespace-pre-wrap">{{msg.text}}</p>
+          </div>
+
+          @if (msg.role === 'bot') {
+          <div
+            class="flex items-center gap-2 mt-2 opacity-0 group-hover:opacity-100 transition-opacity"
+            [class.opacity-100]="msg.showFeedbackForm || msg.rating"
+          >
+            <button
+              (click)="playSpeech(msg.text)"
+              class="w-8 h-8 rounded-full flex items-center justify-center text-stone-400 hover:text-cyril-purple hover:bg-white shadow-sm ring-1 ring-stone-200/50 transition-all"
+              title="Read aloud"
+            >
+              <mat-icon class="!text-[16px]">volume_up</mat-icon>
+            </button>
+            @if (!msg.feedbackSubmitted) {
+            <button
+              (click)="rateMessage(msg.id, 'up')"
+              [class]="'w-8 h-8 rounded-full flex items-center justify-center shadow-sm ring-1 ring-stone-200/50 transition-all ' + (msg.rating === 'up' ? 'text-green-600 bg-green-50 ring-green-200' : 'text-stone-400 hover:text-green-600 hover:bg-white')"
+              title="Good response"
+            >
+              <mat-icon class="!text-[16px]">thumb_up</mat-icon>
+            </button>
+            <button
+              (click)="rateMessage(msg.id, 'down')"
+              [class]="'w-8 h-8 rounded-full flex items-center justify-center shadow-sm ring-1 ring-stone-200/50 transition-all ' + (msg.rating === 'down' ? 'text-red-600 bg-red-50 ring-red-200' : 'text-stone-400 hover:text-red-600 hover:bg-white')"
+              title="Bad response"
+            >
+              <mat-icon class="!text-[16px]">thumb_down</mat-icon>
+            </button>
+            } @else {
+            <span class="text-xs font-semibold text-stone-400 ml-2"
+              >Feedback submitted</span
+            >
             }
           </div>
+
+          @if (msg.showFeedbackForm) {
+          <div
+            class="mt-3 bg-white border border-stone-200/80 rounded-2xl p-4 shadow-sm animate-in fade-in slide-in-from-top-2"
+          >
+            <p
+              class="text-xs uppercase tracking-wider font-bold text-stone-500 mb-3"
+            >
+              Provide additional feedback (optional)
+            </p>
+            <textarea
+              #feedbackInput
+              placeholder="What could be improved?"
+              class="w-full bg-stone-50 border border-stone-200 rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-cyril-purple/30 focus:border-cyril-purple/50 transition-all text-sm min-h-[80px] resize-y mb-3"
+            ></textarea>
+            <div class="flex justify-end gap-3">
+              <button
+                (click)="cancelFeedback(msg.id)"
+                class="text-sm text-stone-500 hover:text-stone-700 font-medium px-3 py-1.5"
+              >
+                Cancel
+              </button>
+              <button
+                (click)="submitFeedback(msg.id, feedbackInput.value)"
+                class="text-sm bg-cyril-purple text-white px-4 py-1.5 rounded-lg font-bold hover:bg-cyril-purple/90 shadow-sm transition-colors"
+              >
+                Submit
+              </button>
+            </div>
+          </div>
+          } }
         </div>
+      </div>
+      } @if (loading()) {
+      <div class="flex gap-3 sm:gap-4 w-full mb-4">
+        <div
+          class="shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white text-cyril-purple border border-cyril-purple/20 flex items-center justify-center shadow-sm mt-1"
+        >
+          <img
+            src="logo.svg"
+            alt="Cyril"
+            class="w-5 h-5 sm:w-6 sm:h-6 object-contain opacity-50"
+          />
+        </div>
+        <div
+          class="bg-white border border-stone-200/80 p-5 rounded-3xl rounded-tl-md shadow-sm flex items-center gap-1.5 h-[52px]"
+        >
+          <div class="w-1.5 h-1.5 rounded-full bg-stone-400 typing-dot"></div>
+          <div class="w-1.5 h-1.5 rounded-full bg-stone-400 typing-dot"></div>
+          <div class="w-1.5 h-1.5 rounded-full bg-stone-400 typing-dot"></div>
+        </div>
+      </div>
       }
-    }
+    </div>
+    } @else if (view() === 'kb') {
+    <!-- Knowledge Base -->
+    <div class="w-full max-w-5xl px-4 py-6 sm:py-8 flex flex-col gap-6">
+      <div
+        class="flex flex-col sm:flex-row sm:items-center justify-between bg-white p-5 sm:p-6 rounded-3xl shadow-sm border border-stone-200/80 gap-4"
+      >
+        <div>
+          <h2
+            class="font-sans text-2xl font-bold text-cyril-purple tracking-tight"
+          >
+            Knowledge Base
+          </h2>
+          <p class="font-serif text-stone-500 text-sm mt-1">
+            Curated documents that shape Cyril's understanding.
+          </p>
+        </div>
+        <p
+          class="font-sans text-sm font-bold text-stone-600 bg-stone-100 px-3 py-1.5 rounded-lg border border-stone-200/50 tracking-wide"
+        >
+          {{kbDocs().length}} docs
+        </p>
+      </div>
+
+      <div
+        class="bg-white border border-stone-200/80 rounded-3xl p-3 sm:p-4 shadow-sm"
+      >
+        <div class="relative">
+          <mat-icon
+            class="absolute left-4 top-1/2 -translate-y-1/2 text-stone-400 !text-xl"
+            >search</mat-icon
+          >
+          <input
+            type="text"
+            [(ngModel)]="kbSearchQuery"
+            placeholder="Search documents by title or content..."
+            class="w-full bg-stone-50 border border-stone-200/80 rounded-2xl pl-12 pr-4 py-3 sm:py-4 outline-none focus:ring-2 focus:ring-cyril-purple/30 focus:border-cyril-purple/50 transition-all text-base"
+          />
+        </div>
+      </div>
+
+      @if (isAdmin()) {
+      <div
+        class="bg-white border border-stone-200/80 rounded-3xl p-5 sm:p-6 shadow-sm flex flex-col gap-4"
+      >
+        <div
+          class="flex items-center justify-between mb-2 border-b border-stone-100 pb-4"
+        >
+          <h3 class="font-bold text-lg text-stone-800 tracking-tight">
+            Add New Document
+          </h3>
+          <button
+            (click)="kbFileInput.click()"
+            class="text-xs uppercase tracking-widest flex items-center gap-2 bg-stone-100 hover:bg-stone-200 text-stone-700 px-4 py-2 rounded-xl transition-colors border border-stone-200 font-bold shadow-sm"
+          >
+            <mat-icon class="!text-[18px] leading-none">upload_file</mat-icon>
+            Upload File
+          </button>
+          <input
+            type="file"
+            accept=".txt,.md"
+            class="hidden"
+            (change)="onKbFileSelected($event)"
+            #kbFileInput
+          />
+        </div>
+        <div class="grid gap-4">
+          <input
+            [(ngModel)]="newDocTitle"
+            placeholder="Document Title"
+            class="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-cyril-purple/30 focus:border-cyril-purple/50 transition-all text-sm font-medium"
+          />
+          <textarea
+            [(ngModel)]="newDocContent"
+            placeholder="Paste document content here..."
+            class="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-cyril-purple/30 focus:border-cyril-purple/50 transition-all text-sm min-h-[120px] resize-y"
+          ></textarea>
+          <textarea
+            [(ngModel)]="newDocInstructions"
+            placeholder="AI Instructions (Optional)... How should Cyril use this document?"
+            class="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-cyril-purple/30 focus:border-cyril-purple/50 transition-all text-sm min-h-[80px] resize-y"
+          ></textarea>
+        </div>
+        <div class="flex justify-end mt-2">
+          <button
+            (click)="addKnowledgeDoc()"
+            [disabled]="kbLoading() || !newDocTitle().trim() || !newDocContent().trim()"
+            class="bg-cyril-purple text-white px-6 py-2.5 rounded-xl text-sm font-bold shadow-md hover:bg-cyril-purple/90 transition-colors disabled:opacity-50 flex items-center gap-2"
+          >
+            @if (kbLoading()) {
+            <mat-icon class="animate-spin !text-[18px]">sync</mat-icon>
+            } @else {
+            <mat-icon class="!text-[18px]">add</mat-icon>
+            } Save Document
+          </button>
+        </div>
+      </div>
+      }
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 pb-10">
+        @for (doc of filteredKbDocs(); track doc.id) {
+        <div
+          class="bg-white border border-stone-200/80 rounded-3xl p-5 sm:p-6 shadow-sm flex flex-col gap-3 group relative overflow-hidden"
+        >
+          <div
+            class="absolute top-0 left-0 w-1 h-full bg-cyril-purple/20"
+          ></div>
+          <div class="flex items-start justify-between">
+            <h4
+              class="font-bold text-base sm:text-lg text-stone-900 pr-8 tracking-tight"
+            >
+              {{doc.title}}
+            </h4>
+            @if (isAdmin()) {
+            <button
+              (click)="deleteKnowledgeDoc(doc.id)"
+              class="text-stone-300 hover:text-red-500 transition-colors bg-white rounded-full p-1"
+              title="Delete Document"
+            >
+              <mat-icon class="!text-[20px]">delete_outline</mat-icon>
+            </button>
+            }
+          </div>
+          <p
+            class="font-mono text-[11px] text-stone-400 uppercase tracking-widest"
+          >
+            Added {{doc.createdAt | date:'mediumDate'}}
+          </p>
+          @if (doc.instructions) {
+          <div
+            class="mt-2 text-xs text-cyril-purple bg-cyril-purple/5 p-3 sm:p-4 rounded-xl border border-cyril-purple/10"
+          >
+            <strong
+              class="font-bold uppercase tracking-wider text-[10px] block mb-1"
+              >Instructions</strong
+            >
+            {{doc.instructions}}
+          </div>
+          }
+          <div
+            class="mt-2 text-sm text-stone-600 bg-stone-50 p-3 sm:p-4 rounded-xl border border-stone-100 max-h-48 overflow-y-auto whitespace-pre-wrap leading-relaxed font-serif"
+          >
+            {{doc.content}}
+          </div>
+        </div>
+        } @if (filteredKbDocs().length === 0) {
+        <div
+          class="text-center py-16 text-stone-400 bg-white border border-stone-200/80 border-dashed rounded-3xl col-span-full"
+        >
+          <mat-icon class="!text-5xl mb-3 opacity-30">description</mat-icon>
+          <p class="font-sans font-medium text-base tracking-wide">
+            No documents found.
+          </p>
+        </div>
+        }
+      </div>
+    </div>
+    } @else if (view() === 'map') {
+    <div class="w-full h-full min-h-[calc(100vh-80px)]">
+      <app-parish-search class="h-full block"></app-parish-search>
+    </div>
+    } }
   </main>
 
   <!-- Footer / Input Area -->
   @if (user() && profileCompleted() && view() === 'chat') {
-  <footer class="w-full shrink-0 flex flex-col items-center justify-end px-4 pb-4 sm:pb-6 relative pointer-events-none mt-auto">
-     <div class="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-stone-50 via-stone-50/80 to-transparent -z-10"></div>
-     <div class="w-full max-w-4xl pointer-events-auto">
-      <div class="flex items-end gap-3 bg-white border border-stone-200/80 rounded-[2rem] p-2 shadow-xl focus-within:ring-2 focus-within:ring-cyril-purple/30 focus-within:border-cyril-purple/50 transition-all mb-4 relative z-10">
-        <button (click)="fileInput.click()" class="shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-stone-400 hover:bg-stone-100 hover:text-cyril-purple transition-all ml-1 mb-1" title="Upload Image">
+  <footer
+    class="w-full shrink-0 flex flex-col items-center justify-end px-4 pb-4 sm:pb-6 relative pointer-events-none mt-auto"
+  >
+    <div
+      class="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-stone-50 via-stone-50/80 to-transparent -z-10"
+    ></div>
+    <div class="w-full max-w-4xl pointer-events-auto">
+      <div
+        class="flex items-end gap-3 bg-white border border-stone-200/80 rounded-[2rem] p-2 shadow-xl focus-within:ring-2 focus-within:ring-cyril-purple/30 focus-within:border-cyril-purple/50 transition-all mb-4 relative z-10"
+      >
+        <button
+          (click)="fileInput.click()"
+          class="shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-stone-400 hover:bg-stone-100 hover:text-cyril-purple transition-all ml-1 mb-1"
+          title="Upload Image"
+        >
           <mat-icon class="!text-2xl">add_photo_alternate</mat-icon>
         </button>
-        
-        <button (click)="toggleVoiceMode()" [class]="'shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all ml-1 mb-1 ' + (isListening() ? 'bg-red-50 text-red-500 animate-pulse' : 'text-stone-400 hover:bg-stone-100 hover:text-cyril-purple')" title="Voice Input">
-          <mat-icon class="!text-2xl">{{isListening() ? 'mic_off' : 'mic'}}</mat-icon>
+
+        <button
+          (click)="toggleVoiceMode()"
+          [class]="'shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all ml-1 mb-1 ' + (isListening() ? 'bg-red-50 text-red-500 animate-pulse' : 'text-stone-400 hover:bg-stone-100 hover:text-cyril-purple')"
+          title="Voice Input"
+        >
+          <mat-icon class="!text-2xl"
+            >{{isListening() ? 'mic_off' : 'mic'}}</mat-icon
+          >
         </button>
-        
-        <textarea 
-          [(ngModel)]="prompt" 
+
+        <textarea
+          [(ngModel)]="prompt"
           (keydown.enter)="onEnter($event)"
-          placeholder="Ask Cyril..." 
+          placeholder="Ask Cyril..."
           class="flex-grow bg-transparent outline-none text-base py-3 sm:py-4 px-2 resize-none max-h-40 min-h-[52px] placeholder:text-stone-400 font-medium"
           rows="1"
           #textarea
-          (input)="adjustTextareaHeight(textarea)"></textarea>
-          
-        <button 
-          (click)="sendMessage()" 
-          [disabled]="loading() || !prompt().trim()" 
-          class="shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center bg-cyril-purple text-white shadow-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-cyril-purple/90 transition-all transform active:scale-95 mb-1 mr-1">
+          (input)="adjustTextareaHeight(textarea)"
+        ></textarea>
+
+        <button
+          (click)="sendMessage()"
+          [disabled]="loading() || !prompt().trim()"
+          class="shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center bg-cyril-purple text-white shadow-md disabled:opacity-50 disabled:cursor-not-allowed hover:bg-cyril-purple/90 transition-all transform active:scale-95 mb-1 mr-1"
+        >
           <mat-icon class="!text-xl ml-1">send</mat-icon>
         </button>
       </div>
-      <input type="file" (change)="onFileSelected($event)" accept="image/*" class="hidden" #fileInput>
-      
-      <div class="flex flex-col items-center justify-center font-sans text-[11px] font-medium text-stone-400 gap-1 mt-2">
+      <input
+        type="file"
+        (change)="onFileSelected($event)"
+        accept="image/*"
+        class="hidden"
+        #fileInput
+      />
+
+      <div
+        class="flex flex-col items-center justify-center font-sans text-[11px] font-medium text-stone-400 gap-1 mt-2"
+      >
         <p class="text-stone-500">Catholic.Work &copy; {{currentYear}}</p>
         <div class="flex items-center gap-3">
-          <a href="https://catholic.work" target="_blank" class="hover:text-cyril-purple transition-colors uppercase tracking-widest font-bold text-[9px]">Website</a>
+          <a
+            href="https://catholic.work"
+            target="_blank"
+            class="hover:text-cyril-purple transition-colors uppercase tracking-widest font-bold text-[9px]"
+            >Website</a
+          >
           <span class="opacity-30">&bull;</span>
-          <span class="uppercase tracking-widest font-bold text-[9px]">Registered TX Nonprofit</span>
+          <span class="uppercase tracking-widest font-bold text-[9px]"
+            >Registered TX Nonprofit</span
+          >
         </div>
       </div>
     </div>
   </footer>
   } @else {
-     <footer class="w-full shrink-0 flex flex-col items-center justify-center py-4 sm:py-6 bg-transparent border-t border-stone-200/50 mt-auto">
-        <div class="flex flex-col items-center justify-center font-sans text-[11px] font-medium text-stone-400 gap-1">
-            <p class="text-stone-500">Catholic.Work &copy; {{currentYear}}</p>
-            <div class="flex items-center gap-3 mt-1">
-            <a href="https://catholic.work" target="_blank" class="hover:text-cyril-purple transition-colors uppercase tracking-widest font-bold text-[9px]">Website</a>
-            <span class="opacity-30">&bull;</span>
-            <span class="uppercase tracking-widest font-bold text-[9px]">Registered TX Nonprofit</span>
-            </div>
-        </div>
-     </footer>
+  <footer
+    class="w-full shrink-0 flex flex-col items-center justify-center py-4 sm:py-6 bg-transparent border-t border-stone-200/50 mt-auto"
+  >
+    <div
+      class="flex flex-col items-center justify-center font-sans text-[11px] font-medium text-stone-400 gap-1"
+    >
+      <p class="text-stone-500">Catholic.Work &copy; {{currentYear}}</p>
+      <div class="flex items-center gap-3 mt-1">
+        <a
+          href="https://catholic.work"
+          target="_blank"
+          class="hover:text-cyril-purple transition-colors uppercase tracking-widest font-bold text-[9px]"
+          >Website</a
+        >
+        <span class="opacity-30">&bull;</span>
+        <span class="uppercase tracking-widest font-bold text-[9px]"
+          >Registered TX Nonprofit</span
+        >
+      </div>
+    </div>
+  </footer>
   }
 </div>
