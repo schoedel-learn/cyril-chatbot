@@ -31,6 +31,29 @@
       },
       "required": ["title", "content", "createdAt", "authorUid"]
     },
+    "ChatSession": {
+      "title": "Chat Session",
+      "description": "A saved conversation session",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Owner UID" },
+        "title": { "type": "string", "description": "Chat title" },
+        "createdAt": { "type": "number", "description": "Creation timestamp" },
+        "messages": { "type": "array", "description": "List of messages" }
+      },
+      "required": ["userId", "title", "createdAt"]
+    },
+    "UserMemory": {
+      "title": "User Memory",
+      "description": "AI's memory of the user",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Owner UID" },
+        "notes": { "type": "string", "description": "Memory notes" },
+        "updatedAt": { "type": "number", "description": "Last update timestamp" }
+      },
+      "required": ["userId", "notes", "updatedAt"]
+    },
     "Feedback": {
       "title": "Feedback",
       "description": "User feedback on AI responses",
@@ -50,7 +73,15 @@
   "firestore": {
     "/users/{userId}": {
       "schema": { "$ref": "User" },
-      "description": "User profile and credit balance"
+      "description": "User profile"
+    },
+    "/users/{userId}/chats/{chatId}": {
+      "schema": { "$ref": "ChatSession" },
+      "description": "Chat sessions for the user"
+    },
+    "/users/{userId}/memory/current": {
+      "schema": { "$ref": "UserMemory" },
+      "description": "AI memory about the user"
     },
     "/knowledge_base/{docId}": {
       "schema": { "$ref": "KnowledgeDocument" },

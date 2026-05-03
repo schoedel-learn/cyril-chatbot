@@ -28,6 +28,17 @@ interface KnowledgeDoc {
   authorUid: string;
 }
 
+enum UserRole {
+  ADMIN = 'admin',
+  CATECHIST = 'Catechist',
+  SPONSOR = 'Sponsor',
+  CANDIDATE = 'Candidate',
+  GENERAL = 'General',
+  OCIA_LEADER = 'OCIA leader',
+  PRIEST = 'Priest',
+  DEACON = 'Deacon'
+}
+
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-root',
@@ -51,9 +62,16 @@ export class App implements OnInit, AfterViewChecked {
   messages = signal<ChatMessage[]>([]);
   prompt = signal('');
   loading = signal(false);
+  isListening = signal(false);
+  private recognition: SpeechRecognition | null = null;
   user = signal<User | null>(null);
   isAdmin = signal<boolean>(false);
   profileCompleted = signal<boolean>(false);
+  userRole = signal<UserRole>(UserRole.GENERAL);
+  selectedPeriod = signal<string>('General');
+  languagePreference = signal<string>('English');
+  useDeepThink = signal<boolean>(false);
+  OCIA_PERIODS = ['Inquiry', 'Catechumenate', 'Purification & Enlightenment', 'Mystagogy', 'General'];
   
   // Profile Form State
   firstName = signal('');
@@ -63,7 +81,45 @@ export class App implements OnInit, AfterViewChecked {
   phone = signal('');
   selectedDiocese = signal('');
   otherDiocese = signal('');
+  selectedRole = signal<UserRole>(UserRole.GENERAL);
   profileLoading = signal(false);
+
+  roles = [
+    { value: UserRole.CANDIDATE, label: 'Candidate / Inquirer' },
+    { value: UserRole.SPONSOR, label: 'Sponsor' },
+    { value: UserRole.CATECHIST, label: 'Catechist' },
+    { value: UserRole.OCIA_LEADER, label: 'OCIA Leader (Director/Coordinator)' },
+    { value: UserRole.PRIEST, label: 'Priest' },
+    { value: UserRole.DEACON, label: 'Deacon' },
+    { value: UserRole.GENERAL, label: 'General Interest' }
+  ];
+
+  getGreetingForRole(role: UserRole): string {
+    switch (role) {
+      case UserRole.CANDIDATE:
+        return "Hi, I'm Cyril. I'm here to support you as you explore the Catholic faith. Whether you're curious about Jesus, have questions about the Mass, or want to know what to expect in the OCIA journey, just ask!";
+      case UserRole.SPONSOR:
+        return "Hi, I'm Cyril! Thank you for stepping up to be a sponsor. I'm here to help you understand your role, guide you on how to share your faith, and explain the rites you'll be participating in. What would you like to know first?";
+      case UserRole.CATECHIST:
+        return "Hello! As a fellow catechist, I'm here to help you prepare engaging sessions, understand the OCIA periods, and break open the Word. How can I assist with your lesson planning today?";
+      case UserRole.OCIA_LEADER:
+        return "Hello! I'm here to assist you with the administration, canonical questions, team formation, and liturgical planning of the OCIA. How can I support your ministry today?";
+      case UserRole.PRIEST:
+        return "Greetings, Father. I'm here to assist with liturgical rubrics, canonical questions regarding faculties and valid baptisms, and homiletic connections for the rites. How can I serve you today?";
+      case UserRole.DEACON:
+        return "Greetings, Deacon. I'm ready to assist with your liturgical roles in the rites, instructions, dismissals, and linking candidates to the parish's charitable works. How can I help?";
+      default:
+        return "Hi, I'm Cyril. I'm an AI assistant designed to help you navigate the Order of Christian Initiation of Adults (OCIA). How can I help you today?";
+    }
+  }
+
+  setInitialGreeting(role: UserRole) {
+    if (this.messages().length === 0) {
+      this.messages.set([{id: Date.now().toString(), role: 'bot', text: this.getGreetingForRole(role)}]);
+    } else if (this.messages().length === 1 && this.messages()[0].role === 'bot') {
+       this.messages.set([{id: this.messages()[0].id, role: 'bot', text: this.getGreetingForRole(role), rating: this.messages()[0].rating, feedbackSubmitted: this.messages()[0].feedbackSubmitted}]);
+    }
+  }
 
   dioceses = [
     "Albany", "Alexandria", "Allentown", "Altoona-Johnstown", "Amarillo", "Anchorage-Juneau", "Arlington", "Atlanta", "Austin", "Baker", "Baltimore", "Baton Rouge", "Beaumont", "Belleville", "Biloxi", "Birmingham", "Bismarck", "Boise", "Boston", "Bridgeport", "Brooklyn", "Brownsville", "Buffalo", "Burlington", "Camden", "Charleston", "Charlotte", "Cheyenne", "Chicago", "Cincinnati", "Cleveland", "Colorado Springs", "Columbus", "Corpus Christi", "Covington", "Crookston", "Dallas", "Davenport", "Denver", "Des Moines", "Detroit", "Dodge City", "Dubuque", "Duluth", "El Paso", "Erie", "Evansville", "Fairbanks", "Fall River", "Fargo", "Fort Wayne-South Bend", "Fort Worth", "Fresno", "Gallup", "Galveston-Houston", "Gary", "Gaylord", "Grand Island", "Grand Rapids", "Great Falls-Billings", "Green Bay", "Greensburg", "Harrisburg", "Hartford", "Helena", "Honolulu", "Houma-Thibodaux", "Indianapolis", "Jackson", "Jefferson City", "Joliet", "Kalamazoo", "Kansas City in Kansas", "Kansas City-St. Joseph", "Knoxville", "La Crosse", "Lafayette", "Lafayette in Indiana", "Lake Charles", "Lansing", "Laredo", "Las Cruces", "Las Vegas", "Lexington", "Lincoln", "Little Rock", "Los Angeles", "Louisville", "Lubbock", "Madison", "Manchester", "Marquette", "Memphis", "Metuchen", "Miami", "Military Archdiocese", "Milwaukee", "Mobile", "Monterey", "Nashville", "New Orleans", "New Ulm", "New York", "Newark", "Norwich", "Oakland", "Ogdensburg", "Oklahoma City", "Omaha", "Orange", "Orlando", "Owensboro", "Palm Beach", "Passaic", "Paterson", "Pensacola-Tallahassee", "Peoria", "Philadelphia", "Phoenix", "Pittsburgh", "Portland", "Providence", "Pueblo", "Raleigh", "Rapid City", "Reno", "Richmond", "Rochester", "Rockford", "Rockville Centre", "Sacramento", "Saginaw", "Salina", "Salt Lake City", "San Angelo", "San Antonio", "San Bernardino", "San Diego", "San Francisco", "San Jose", "Santa Fe", "Santa Rosa", "Savannah", "Scranton", "Seattle", "Shreveport", "Sioux City", "Sioux Falls", "Spokane", "Springfield", "Springfield in Illinois", "Springfield-Cape Girardeau", "St. Augustine", "St. Cloud", "St. Petersburg", "Steubenville", "Stockton", "Superior", "Syracuse", "Toledo", "Trenton", "Tucson", "Tulsa", "Tyler", "Venice", "Victoria", "Washington", "Wheeling-Charleston", "Wichita", "Wilmington", "Winona-Rochester", "Worcester", "Yakima", "Youngstown", "Other"
@@ -90,29 +146,73 @@ export class App implements OnInit, AfterViewChecked {
   @ViewChild('scrollContainer') private scrollContainer!: ElementRef;
 
   ngOnInit() {
+    if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      const recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'en-US';
+      
+      recognition.onresult = (event: SpeechRecognitionEvent) => {
+        const transcript = event.results[0][0].transcript;
+        this.prompt.set(transcript);
+        this.isListening.set(false);
+        this.sendMessage();
+      };
+      
+      recognition.onerror = (event: any) => {
+        console.error('Speech recognition error', event);
+        this.isListening.set(false);
+      };
+      this.recognition = recognition;
+    }
+
     onAuthStateChanged(auth, async (user) => {
+      if (user && !['schoedelb@gmail.com', 'barry@schoedel.design'].includes(user.email || '')) {
+        await auth.signOut();
+        alert('Access Restricted. For a demo, please contact barry@schoedel.design.');
+        this.user.set(null);
+        return;
+      }
+      
       this.user.set(user);
       if (user) {
         const userDocRef = doc(db, 'users', user.uid);
         const userDoc = await getDoc(userDocRef);
         
-        let role = 'user';
+        let role = UserRole.GENERAL;
         let isProfileCompleted = false;
         
         if (userDoc.exists()) {
-          role = userDoc.data()['role'] || 'user';
+          role = (userDoc.data()['role'] as UserRole) || UserRole.GENERAL;
           isProfileCompleted = userDoc.data()['profileCompleted'] === true;
+          
+          if (isProfileCompleted) {
+            this.firstName.set(userDoc.data()['firstName'] || '');
+            this.lastName.set(userDoc.data()['lastName'] || '');
+            this.parishName.set(userDoc.data()['parishName'] || '');
+            this.selectedDiocese.set(userDoc.data()['diocese'] || '');
+            this.otherDiocese.set(userDoc.data()['otherDiocese'] || '');
+            this.selectedRole.set(role);
+          }
         } else {
           // Check if default admin
           if (user.email === 'schoedelb@gmail.com' && user.emailVerified) {
-            role = 'admin';
+            role = UserRole.ADMIN;
           }
           await setDoc(userDocRef, {uid: user.uid, email: user.email, role, profileCompleted: false});
         }
         
         this.profileCompleted.set(isProfileCompleted);
-        this.isAdmin.set(role === 'admin' || (user.email === 'schoedelb@gmail.com' && user.emailVerified));
+        this.isAdmin.set(role === UserRole.ADMIN || (user.email === 'schoedelb@gmail.com' && user.emailVerified));
+        this.userRole.set(role);
+        this.selectedRole.set(role);
+        this.gemini.setUserRole(role);
         this.email.set(user.email || '');
+        
+        if (isProfileCompleted) {
+          this.setInitialGreeting(role);
+        }
         
         // Listen to Knowledge Base documents
         onSnapshot(collection(db, 'knowledge_base'), (snapshot) => {
@@ -129,6 +229,27 @@ export class App implements OnInit, AfterViewChecked {
         }, (error) => {
           console.error('Error fetching knowledge base:', error);
         });
+
+        // Load Memory
+        const memoryDocRef = doc(db, 'users', user.uid, 'memory', 'current');
+        const memoryDoc = await getDoc(memoryDocRef);
+        if (memoryDoc.exists()) {
+          const notes = memoryDoc.data()['notes'] || '';
+          this.gemini.setUserMemory(notes);
+        }
+
+        // Ask for language preference if not set
+        if (!userDoc.data()?.['languagePreference']) {
+          const lang = prompt("What language do you prefer? (English/Spanish)", "English");
+          if (lang) {
+            this.languagePreference.set(lang);
+            this.gemini.setLanguage(lang);
+            await setDoc(userDocRef, {languagePreference: lang}, { merge: true });
+          }
+        } else {
+          this.languagePreference.set(userDoc.data()?.['languagePreference']);
+          this.gemini.setLanguage(userDoc.data()?.['languagePreference']);
+        }
       }
     });
   }
@@ -166,6 +287,19 @@ export class App implements OnInit, AfterViewChecked {
   async sendMessage() {
     if (!this.prompt().trim() || !this.user()) return;
     const userMessage = this.prompt().trim();
+    
+    // Add memory detection
+    if (userMessage.toLowerCase().startsWith('cyril, remember')) {
+      const memoryToSave = userMessage.substring('cyril, remember'.length).trim();
+      if (memoryToSave) {
+        await this.addNewMemory(memoryToSave);
+        this.prompt.set('');
+        this.messages.update(m => [...m, {id: Date.now().toString(), role: 'user', text: userMessage}]);
+        this.messages.update(m => [...m, {id: Date.now().toString(), role: 'bot', text: 'Got it! I will remember that.'}]);
+        return;
+      }
+    }
+    
     this.prompt.set('');
     
     // Reset textarea height
@@ -174,18 +308,50 @@ export class App implements OnInit, AfterViewChecked {
       textarea.style.height = 'auto';
     }
 
-    this.messages.update(m => [...m, {id: Date.now().toString(), role: 'user', text: userMessage}]);
+    const newMessage: ChatMessage = {id: Date.now().toString(), role: 'user', text: userMessage};
+    this.messages.update(m => [...m, newMessage]);
     this.loading.set(true);
     
     try {
-      const response = await this.gemini.chat(userMessage);
-      this.messages.update(m => [...m, {id: Date.now().toString(), role: 'bot', text: response.text || ''}]);
+      this.gemini.setSelectedPeriod(this.selectedPeriod());
+      const response = await this.gemini.chat(userMessage, this.useDeepThink());
+      const botMessage: ChatMessage = {id: Date.now().toString(), role: 'bot', text: response.text || ''};
+      this.messages.update(m => [...m, botMessage]);
+      await this.saveChatSession([newMessage, botMessage]);
     } catch (error) {
       console.error("Error sending message:", error);
       this.messages.update(m => [...m, {id: Date.now().toString(), role: 'bot', text: 'Sorry, I encountered an error processing your request.'}]);
     } finally {
       this.loading.set(false);
     }
+  }
+
+  async saveChatSession(newMessages: ChatMessage[]) {
+    if (!this.user()) return;
+    const chatRef = doc(collection(db, 'users', this.user()!.uid, 'chats'));
+    await setDoc(chatRef, {
+      userId: this.user()!.uid,
+      title: newMessages[0].text.substring(0, 50),
+      createdAt: Date.now(),
+      messages: this.messages() // Save full chat history
+    });
+  }
+
+  async addNewMemory(newNote: string) {
+    if (!this.user()) return;
+    const memoryDocRef = doc(db, 'users', this.user()!.uid, 'memory', 'current');
+    const memoryDoc = await getDoc(memoryDocRef);
+    let currentNotes = '';
+    if (memoryDoc.exists()) {
+      currentNotes = memoryDoc.data()['notes'] || '';
+    }
+    const updatedNotes = currentNotes ? `${currentNotes}\n${newNote}` : newNote;
+    await setDoc(memoryDocRef, {
+      userId: this.user()!.uid,
+      notes: updatedNotes,
+      updatedAt: Date.now()
+    });
+    this.gemini.setUserMemory(updatedNotes);
   }
 
   async onFileSelected(event: Event) {
@@ -236,12 +402,19 @@ export class App implements OnInit, AfterViewChecked {
         phone: this.phone().trim(),
         diocese: this.selectedDiocese(),
         otherDiocese: this.selectedDiocese() === 'Other' ? this.otherDiocese().trim() : '',
+        role: this.selectedRole(),
         profileCompleted: true
       };
 
       // Save to Firestore
       await setDoc(doc(db, 'users', this.user()!.uid), profileData, { merge: true });
       
+      this.userRole.set(this.selectedRole());
+      this.gemini.setUserRole(this.selectedRole());
+      const isDevAdmin = this.user()?.email === 'schoedelb@gmail.com' && this.user()?.emailVerified === true;
+      this.isAdmin.set(this.selectedRole() === UserRole.ADMIN || isDevAdmin);
+      this.setInitialGreeting(this.selectedRole());
+
       // Send email via backend
       try {
         await fetch('/api/send-profile', {
@@ -314,6 +487,16 @@ export class App implements OnInit, AfterViewChecked {
 
   cancelFeedback(msgId: string) {
     this.messages.update(msgs => msgs.map(m => m.id === msgId ? {...m, showFeedbackForm: false, rating: undefined} : m));
+  }
+
+  toggleVoiceMode() {
+    if (this.isListening()) {
+      this.recognition?.stop();
+      this.isListening.set(false);
+    } else {
+      this.recognition?.start();
+      this.isListening.set(true);
+    }
   }
 
   // Knowledge Base Methods
