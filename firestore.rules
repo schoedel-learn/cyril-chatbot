@@ -118,7 +118,8 @@ service cloud.firestore {
              (!('placeId' in data) || data.placeId is string) &&
              (!('lat' in data) || data.lat is number) &&
              (!('lng' in data) || data.lng is number) &&
-             (!('adminIds' in data) || data.adminIds is list);
+             (!('adminIds' in data) || data.adminIds is list) &&
+             (!('website' in data) || data.website is string);
     }
 
     // ===============================================================

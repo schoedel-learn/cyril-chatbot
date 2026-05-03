@@ -26,8 +26,11 @@ import {
   onSnapshot,
   addDoc,
   deleteDoc,
+  query,
+  where,
+  getDocs,
 } from "firebase/firestore";
-import { ParishSearchComponent } from "./parish-search.component";
+import { ParishSearchComponent, ParishResult } from "./parish-search.component";
 
 interface ChatMessage {
   id: string;
@@ -99,6 +102,9 @@ export class App implements OnInit, AfterViewChecked {
     "General",
   ];
 
+  // Auth Messaging
+  authMessage = signal<string | null>(null);
+
   // Profile Form State
   firstName = signal("");
   lastName = signal("");
@@ -109,6 +115,15 @@ export class App implements OnInit, AfterViewChecked {
   otherDiocese = signal("");
   selectedRole = signal<UserRole>(UserRole.GENERAL);
   profileLoading = signal(false);
+
+  showParishSearch = signal(false);
+  selectedParishResult = signal<ParishResult | null>(null);
+
+  onParishSelected(result: ParishResult) {
+    this.selectedParishResult.set(result);
+    this.parishName.set(result.name);
+    this.showParishSearch.set(false);
+  }
 
   roles = [
     { value: UserRole.CANDIDATE, label: "Candidate / Inquirer" },
@@ -369,8 +384,8 @@ export class App implements OnInit, AfterViewChecked {
   ngOnInit() {
     if ("SpeechRecognition" in window || "webkitSpeechRecognition" in window) {
       const SpeechRecognition =
-        (window as any).SpeechRecognition ||
-        (window as any).webkitSpeechRecognition;
+        (window as unknown as { SpeechRecognition: typeof window.SpeechRecognition }).SpeechRecognition ||
+        (window as unknown as { webkitSpeechRecognition: typeof window.webkitSpeechRecognition }).webkitSpeechRecognition;
       const recognition = new SpeechRecognition();
       recognition.continuous = false;
       recognition.interimResults = false;
@@ -383,7 +398,7 @@ export class App implements OnInit, AfterViewChecked {
         this.sendMessage();
       };
 
-      recognition.onerror = (event: any) => {
+      recognition.onerror = (event: Event) => {
         console.error("Speech recognition error", event);
         this.isListening.set(false);
       };
@@ -398,7 +413,7 @@ export class App implements OnInit, AfterViewChecked {
         )
       ) {
         await auth.signOut();
-        alert(
+        this.authMessage.set(
           "Access Restricted. For a demo, please contact barry@schoedel.design.",
         );
         this.user.set(null);
@@ -527,7 +542,23 @@ export class App implements OnInit, AfterViewChecked {
   }
 
   async signIn() {
-    await signInWithPopup(auth, googleProvider);
+    this.authMessage.set(null);
+    try {
+      await signInWithPopup(auth, googleProvider);
+    } catch (error) {
+      console.error("Sign in error: ", error);
+      if (error instanceof Error && error.message.includes("auth/unauthorized-domain")) {
+        this.authMessage.set("Domain not authorized. Please know that it can take 5-10 minutes for Firebase to propagate the newly added domains. Alternatively, try opening the app in a new tab by clicking the arrow icon in the top right of the preview.");
+      } else if (error instanceof Error && error.message.includes("auth/popup-closed-by-user")) {
+        this.authMessage.set("The sign-in popup was closed before completing. If you are having trouble, try opening the app in a new tab using the arrow icon in the top right.");
+      } else {
+        this.authMessage.set("An error occurred during sign in: " + (error as Error).message);
+      }
+    }
+  }
+
+  signUpInfo() {
+    this.authMessage.set("Contact barry@catholic.work for more info.");
   }
 
   onEnter(event: Event) {
@@ -726,10 +757,39 @@ export class App implements OnInit, AfterViewChecked {
 
     this.profileLoading.set(true);
     try {
+      let parishId = "";
+      const parishResult = this.selectedParishResult();
+
+      if (parishResult) {
+        // Find if parish already exists
+        const q = query(
+          collection(db, "parishes"),
+          where("name", "==", parishResult.name),
+          where("address", "==", parishResult.address),
+        );
+        const snapshot = await getDocs(q);
+
+        if (!snapshot.empty) {
+          parishId = snapshot.docs[0].id;
+        } else {
+          // Create new parish record
+          const parishDocRef = await addDoc(collection(db, "parishes"), {
+            name: parishResult.name,
+            address: parishResult.address,
+            lat: parishResult.lat || 0,
+            lng: parishResult.lng || 0,
+            adminIds: [],
+            website: parishResult.website || "",
+          });
+          parishId = parishDocRef.id;
+        }
+      }
+
       const profileData = {
         firstName: this.firstName().trim(),
         lastName: this.lastName().trim(),
         parishName: this.parishName().trim(),
+        parishId: parishId,
         email: this.email().trim(),
         phone: this.phone().trim(),
         diocese: this.selectedDiocese(),

@@ -6,6 +6,8 @@ import {
   OnDestroy,
   ViewChild,
   signal,
+  output,
+  Input,
 } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { MatIconModule } from "@angular/material/icon";
@@ -16,12 +18,13 @@ import { TitleCasePipe } from "@angular/common";
 import * as L from "leaflet";
 import { GeminiService } from "./gemini.service";
 
-interface ParishResult {
+export interface ParishResult {
   name: string;
-  type: "church" | "school" | "other";
+  type: "church" | "school" | "newman_center" | "other";
   address: string;
   lat: number;
   lng: number;
+  website?: string;
 }
 
 @Component({
@@ -38,28 +41,38 @@ interface ParishResult {
   template: `
     <div class="h-full flex flex-col pt-16">
       <div
-        class="p-6 shrink-0 z-20 bg-white/80 backdrop-blur-md border-b border-stone-200"
+        class="p-6 shrink-0 z-20 bg-white/80 backdrop-blur-md border-b border-stone-200 flex justify-between items-start gap-4"
       >
-        <h2 class="text-2xl font-serif text-cyril-purple mb-4">
-          Find Your Parish
-        </h2>
-        <div class="flex gap-4">
-          <input
-            [(ngModel)]="searchQuery"
-            (keyup.enter)="search()"
-            type="text"
-            placeholder="Search by city, zip code, or parish name..."
-            class="flex-1 w-full bg-stone-100 border-none rounded-xl px-4 py-3 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-cyril-purple/20 transition-all text-sm font-medium"
-          />
-          <button
-            (click)="search()"
-            [disabled]="loading()"
-            class="bg-cyril-purple text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-opacity-90 disabled:opacity-50"
-          >
-            <mat-icon class="!text-sm">search</mat-icon>
-            {{ loading() ? "Searching..." : "Search" }}
-          </button>
+        <div class="flex-1">
+          <h2 class="text-2xl font-serif text-cyril-purple mb-4">
+            Find Your Parish
+          </h2>
+          <div class="flex gap-4">
+            <input
+              [(ngModel)]="searchQuery"
+              (keyup.enter)="search()"
+              type="text"
+              placeholder="Search by city, zip code, or parish name..."
+              class="flex-1 w-full bg-stone-100 border-none rounded-xl px-4 py-3 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-cyril-purple/20 transition-all text-sm font-medium"
+            />
+            <button
+              (click)="search()"
+              [disabled]="loading()"
+              class="bg-cyril-purple text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 hover:bg-opacity-90 disabled:opacity-50"
+            >
+              <mat-icon class="!text-sm">search</mat-icon>
+              {{ loading() ? "Searching..." : "Search" }}
+            </button>
+          </div>
         </div>
+        @if (allowClose) {
+          <button
+            (click)="closeSearch.emit()"
+            class="text-stone-400 hover:text-stone-600 p-2 rounded-full hover:bg-stone-100 bg-white shadow-sm ring-1 ring-stone-200"
+          >
+            <mat-icon>close</mat-icon>
+          </button>
+        }
       </div>
 
       <div class="flex-1 flex min-h-0 relative z-10">
@@ -83,19 +96,21 @@ interface ParishResult {
               @for (result of results(); track $index) {
                 <div
                   (click)="focusOn(result)"
-                  class="bg-white p-4 rounded-xl border border-stone-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                  class="bg-white p-4 rounded-xl border border-stone-200 shadow-sm hover:shadow-md transition-shadow cursor-pointer flex flex-col gap-3"
                 >
                   <div class="flex items-start gap-3">
                     <mat-icon
                       [class]="
                         result.type === 'school'
                           ? 'text-amber-600'
-                          : 'text-cyril-purple'
+                          : result.type === 'newman_center'
+                            ? 'text-blue-600'
+                            : 'text-cyril-purple'
                       "
                     >
-                      {{ result.type === "school" ? "school" : "church" }}
+                      {{ result.type === "school" ? "school" : result.type === "newman_center" ? "school" : "church" }}
                     </mat-icon>
-                    <div>
+                    <div class="flex-1">
                       <h3 class="font-bold text-stone-900 leading-tight">
                         {{ result.name }}
                       </h3>
@@ -105,8 +120,27 @@ interface ParishResult {
                       <p class="text-xs text-stone-600 mt-2 line-clamp-2">
                         {{ result.address }}
                       </p>
+                      @if (result.website) {
+                        <a
+                          [href]="result.website"
+                          target="_blank"
+                          class="text-xs text-blue-600 hover:underline mt-1 inline-block break-all"
+                          (click)="$event.stopPropagation()"
+                          >{{ result.website }}</a
+                        >
+                      }
                     </div>
                   </div>
+                  @if (allowSelect) {
+                    <button
+                      (click)="
+                        selectThisParish(result); $event.stopPropagation()
+                      "
+                      class="w-full mt-2 py-2 bg-stone-100 hover:bg-cyril-purple hover:text-white text-stone-600 text-xs font-bold rounded-lg transition-colors border border-stone-200 hover:border-cyril-purple"
+                    >
+                      Select This Parish
+                    </button>
+                  }
                 </div>
               }
             </div>
@@ -115,7 +149,7 @@ interface ParishResult {
 
         <!-- Map Area -->
         <div class="flex-1 relative">
-          <div #mapContainer class="absolute inset-0"></div>
+          <div #mapContainer class="absolute inset-0 z-0"></div>
         </div>
       </div>
     </div>
@@ -126,6 +160,13 @@ export class ParishSearchComponent implements OnInit, OnDestroy {
   loading = signal(false);
   hasSearched = signal(false);
   results = signal<ParishResult[]>([]);
+
+  // Outputs and inputs equivalent
+  parishSelected = output<ParishResult>();
+  closeSearch = output<void>();
+
+  @Input() allowSelect = false;
+  @Input() allowClose = false;
 
   @ViewChild("mapContainer", { static: true }) mapContainer!: ElementRef;
   private map!: L.Map;
@@ -141,7 +182,7 @@ export class ParishSearchComponent implements OnInit, OnDestroy {
       "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png";
     const iconDefault = L.icon({
       iconRetinaUrl,
-      iconUrl,
+      iconUrl, // Need to make this all work properly
       shadowUrl,
       iconSize: [25, 41],
       iconAnchor: [12, 41],
@@ -196,19 +237,20 @@ export class ParishSearchComponent implements OnInit, OnDestroy {
 
       // Use Gemini to semantically find Catholic parishes and disambiguate
       const prompt = `
-        I need a list of Catholic churches, parishes, missions, cathedrals, and Catholic schools in or near "${this.searchQuery()}".
+        I need a list of Catholic locations that might host an OCIA (Order of Christian Initiation of Adults) program in or near "${this.searchQuery()}".
+        This includes Catholic churches, parishes, missions, cathedrals, Catholic schools, Universities, and Newman Centers.
         If there are multiple entries for one location (e.g., a school, a church, a rental facility), carefully disambiguate them and list them as separate items if they are distinct entities.
-        Focus primarily on churches. If there is a Catholic school, include it but mark the type as "school".
         
         Return ONLY a raw, valid JSON array of objects. Do not wrap it in markdown. 
         Each object must have: 
         - "name": string
-        - "type": "church" | "school" | "other"
+        - "type": "church" | "school" | "newman_center" | "other"
         - "address": string
         - "lat": number (approximate latitude)
         - "lng": number (approximate longitude)
+        - "website": string (the official website URL of the location, if available and verified. If none, omit or null)
         
-        Use your Google Search tool if needed to find exact addresses and approximate coordinates. If you cannot find exact coordinates, approximate based on the city/street.
+        Use your Google Search tool if needed to find exact addresses, approximate coordinates, and official websites. If you cannot find exact coordinates, approximate based on the city/street.
       `;
 
       const responseText = await this.gemini.searchParishes(prompt);
@@ -267,5 +309,9 @@ export class ParishSearchComponent implements OnInit, OnDestroy {
         marker.openPopup();
       }
     }
+  }
+
+  selectThisParish(result: ParishResult) {
+    this.parishSelected.emit(result);
   }
 }

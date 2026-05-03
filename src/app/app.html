@@ -5,6 +5,12 @@
   <header
     class="px-4 py-3 sm:px-6 sm:py-4 border-b border-stone-200 bg-white/80 backdrop-blur-md sticky top-0 z-20 flex items-center justify-between shrink-0 shadow-sm"
   >
+    @if (authMessage()) {
+      <div class="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-stone-800 text-white px-6 py-4 rounded-2xl shadow-2xl flex items-center gap-4 max-w-sm w-full font-serif border border-stone-700/50">
+        <span class="flex-grow text-sm sm:text-base leading-relaxed">{{authMessage()}}</span>
+        <button (click)="authMessage.set(null)" class="text-stone-400 hover:text-white px-2 py-1 text-2xl leading-none transition-colors">&times;</button>
+      </div>
+    }
     <div class="flex items-center gap-3">
       <img
         src="logo.svg"
@@ -15,7 +21,7 @@
       <h1
         class="font-sans text-xl sm:text-2xl font-extrabold text-cyril-purple leading-tight tracking-tight"
       >
-        Cyril
+        Catholic.Work
       </h1>
     </div>
     <div class="flex items-center gap-3 sm:gap-4">
@@ -91,13 +97,6 @@
           />
         </button>
       </div>
-      } @else {
-      <button
-        (click)="signIn()"
-        class="text-sm font-semibold text-white bg-cyril-purple hover:bg-cyril-purple/90 transition-colors px-5 py-2.5 rounded-full shadow-md"
-      >
-        Sign In
-      </button>
       }
     </div>
   </header>
@@ -130,14 +129,24 @@
       <p
         class="font-serif text-stone-500 text-base sm:text-lg mb-10 leading-relaxed max-w-md"
       >
-        An intelligent pastoral and catechetical assistant for the Order of
+        An intelligent pastoral and catechetical assistance tool for the Order of
         Christian Initiation of Adults.
       </p>
       <div
-        class="flex flex-col items-center gap-3 text-sm text-stone-400 font-medium uppercase tracking-widest animate-pulse"
+        class="flex flex-col sm:flex-row items-center gap-4 mt-2"
       >
-        <mat-icon class="!text-[24px] !w-6 !h-6">arrow_upward</mat-icon>
-        <span>Sign in above to begin</span>
+        <button
+          (click)="signIn()"
+          class="text-base font-semibold text-white bg-cyril-purple hover:bg-cyril-purple/90 transition-colors px-8 py-3 rounded-full shadow-md"
+        >
+          Sign In
+        </button>
+        <button
+          (click)="signUpInfo()"
+          class="text-base font-semibold text-cyril-purple bg-white border border-cyril-purple hover:bg-stone-50 transition-colors px-8 py-3 rounded-full shadow-sm"
+        >
+          Sign Up
+        </button>
       </div>
     </div>
     } @else if (!profileCompleted()) {
@@ -191,12 +200,20 @@
               class="block text-xs uppercase tracking-wider font-bold text-stone-500 mb-1.5"
               >Parish Name *</label
             >
-            <input
-              id="parishName"
-              [(ngModel)]="parishName"
-              type="text"
-              class="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-cyril-purple/30 focus:border-cyril-purple/50 transition-all text-sm"
-            />
+            <div class="flex gap-2">
+              <input
+                id="parishName"
+                [(ngModel)]="parishName"
+                type="text"
+                class="flex-1 w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-cyril-purple/30 focus:border-cyril-purple/50 transition-all text-sm"
+              />
+              <button
+                (click)="showParishSearch.set(true)"
+                class="shrink-0 bg-stone-100 hover:bg-stone-200 border border-stone-200 text-stone-600 px-4 rounded-xl flex items-center justify-center font-bold text-sm transition-colors cursor-pointer gap-1"
+              >
+                <mat-icon class="!text-sm">map</mat-icon> Search on Map
+              </button>
+            </div>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -712,5 +729,19 @@
       </div>
     </div>
   </footer>
+  }
+
+  @if (showParishSearch()) {
+    <div class="fixed inset-0 z-50 bg-stone-900/50 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6">
+      <div class="bg-white rounded-[2rem] shadow-2xl w-full h-full max-w-6xl max-h-[90vh] overflow-hidden flex flex-col animate-in zoom-in-95 duration-200">
+        <app-parish-search 
+          class="flex-1 overflow-hidden" 
+          [allowClose]="true" 
+          [allowSelect]="true"
+          (closeSearch)="showParishSearch.set(false)"
+          (parishSelected)="onParishSelected($event)"
+        ></app-parish-search>
+      </div>
+    </div>
   }
 </div>

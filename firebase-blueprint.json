@@ -10,7 +10,8 @@
         "placeId": { "type": "string", "description": "Google Maps Place ID, if applicable" },
         "lat": { "type": "number", "description": "Latitude" },
         "lng": { "type": "number", "description": "Longitude" },
-        "adminIds": { "type": "array", "description": "UIDs of parish admins"}
+        "adminIds": { "type": "array", "description": "UIDs of parish admins"},
+        "website": { "type": "string", "description": "Official website URL" }
       },
       "required": ["name", "address"]
     },

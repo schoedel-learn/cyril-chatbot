@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "dev": "cross-env ng serve --port=3000 --host=0.0.0.0 --allowed-hosts all --define=\"GEMINI_API_KEY=\\'${GEMINI_API_KEY}\\'\" ${DISABLE_HMR:+--live-reload=false}",
+    "dev": "cross-env ng serve --port=3000 --host=0.0.0.0 --allowed-hosts --define=\"GEMINI_API_KEY=\\'${GEMINI_API_KEY}\\'\" ${DISABLE_HMR:+--live-reload=false}",
     "build": "cross-env ng build --define=\"GEMINI_API_KEY=\\'${GEMINI_API_KEY}\\'\"",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
