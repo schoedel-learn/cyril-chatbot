@@ -547,13 +547,6 @@ export class App implements OnInit, AfterViewChecked {
       await signInWithPopup(auth, googleProvider);
     } catch (error) {
       console.error("Sign in error: ", error);
-      if (error instanceof Error && error.message.includes("auth/unauthorized-domain")) {
-        this.authMessage.set("Domain not authorized. Please know that it can take 5-10 minutes for Firebase to propagate the newly added domains. Alternatively, try opening the app in a new tab by clicking the arrow icon in the top right of the preview.");
-      } else if (error instanceof Error && error.message.includes("auth/popup-closed-by-user")) {
-        this.authMessage.set("The sign-in popup was closed before completing. If you are having trouble, try opening the app in a new tab using the arrow icon in the top right.");
-      } else {
-        this.authMessage.set("An error occurred during sign in: " + (error as Error).message);
-      }
     }
   }
 
