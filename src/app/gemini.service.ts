@@ -1,9 +1,8 @@
 import { Injectable } from '@angular/core';
-import { GoogleGenAI } from '@google/genai';
+import { auth } from './firebase';
 
 @Injectable({ providedIn: 'root' })
 export class GeminiService {
-  private ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
 
   private basePersona = `You are Cyril, an Assistant Catechist for the OCIA, representing Catholic.Work. 
   You have technical mastery of the Order of Christian Initiation of Adults and the National Statutes.
@@ -114,52 +113,67 @@ Your goal is to support his unique diaconal ministry within the OCIA.
     return instruction;
   }
 
-  async chat(prompt: string, useDeepThink: boolean = false) {
-    const chat = this.ai.chats.create({
-      model: useDeepThink ? 'gemini-3.1-pro-preview' : 'gemini-3.1-flash-lite-preview',
-      config: { 
-        systemInstruction: this.getSystemInstruction(),
-        tools: [{ googleSearch: {} }] 
+  private async callApi(endpoint: string, data: any) {
+    const user = auth.currentUser;
+    if (!user) throw new Error('User not authenticated');
+    
+    const token = await user.getIdToken();
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const baseUrl = isLocalhost ? 'http://localhost:3005' : 'https://bot.schoedeldesign.ai';
+    
+    const response = await fetch(`${baseUrl}/api/${endpoint}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
       },
+      body: JSON.stringify(data)
     });
-    return await chat.sendMessage({ message: prompt });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'API Request failed');
+    }
+    return response.json();
+  }
+
+  async chat(prompt: string, useDeepThink: boolean = false) {
+    const result = await this.callApi('chat', {
+      prompt,
+      useDeepThink,
+      systemInstruction: this.getSystemInstruction()
+    });
+    return result as { text: string };
   }
 
   async searchParishes(prompt: string): Promise<string> {
-    const chat = this.ai.chats.create({
-      model: 'gemini-3.1-pro-preview',
-      config: { 
-        tools: [{ googleSearch: {} }],
-        temperature: 0.1
-      },
-    });
-    const response = await chat.sendMessage({ message: prompt });
-    return response.text || "[]";
+    const result = await this.callApi('searchParishes', { prompt });
+    return (result as { text: string }).text;
   }
 
   async analyzeImage(prompt: string, base64Image: string, mimeType: string) {
-    return await this.ai.models.generateContent({
-      model: 'gemini-3.1-pro-preview',
-      contents: {
-        parts: [
-          { inlineData: { data: base64Image, mimeType } },
-          { text: prompt },
-        ],
-      },
-      config: { systemInstruction: this.getSystemInstruction() },
+    const result = await this.callApi('analyzeImage', {
+      prompt,
+      base64Image,
+      mimeType,
+      systemInstruction: this.getSystemInstruction()
     });
+    return result as { text: string };
   }
 
   async generateSpeech(text: string) {
-    return await this.ai.models.generateContent({
-      model: 'gemini-2.5-flash-preview-tts',
-      contents: { parts: [{ text }] },
-      config: {
-        responseModalities: ['AUDIO'],
-        speechConfig: {
-          voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } },
-        },
-      },
-    });
+    const data = await this.callApi('generateSpeech', { text }) as { audioData: string };
+    
+    return {
+      candidates: [
+        {
+          content: {
+            parts: [
+              { inlineData: { data: data.audioData } }
+            ]
+          }
+        }
+      ]
+    };
   }
 }

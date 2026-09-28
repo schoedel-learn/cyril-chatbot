@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "dev": "cross-env ng serve --port=3000 --host=0.0.0.0 --allowed-hosts --define=\"GEMINI_API_KEY=\\'${GEMINI_API_KEY}\\'\" ${DISABLE_HMR:+--live-reload=false}",
-    "build": "cross-env ng build --define=\"GEMINI_API_KEY=\\'${GEMINI_API_KEY}\\'\"",
+    "dev": "cross-env ng serve --port=3000 --host=0.0.0.0 --allowed-hosts ${DISABLE_HMR:+--live-reload=false}",
+    "build": "cross-env ng build --base-href /cyril/",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint": "ng lint"

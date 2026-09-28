@@ -45,3 +45,10 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# added during the 2026-09-28 workstation cleanup
+dist/
+build/
+.env
+.env.local
+*.log
